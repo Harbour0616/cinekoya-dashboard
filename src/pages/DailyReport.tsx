@@ -1,8 +1,18 @@
 import { useEffect, useState, useMemo, useRef } from "react";
 import { Pencil, Trash2, Search } from "lucide-react";
+import { Bar } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Tooltip,
+} from "chart.js";
 import { supabase } from "../lib/supabase";
 import { TICKET_TYPES } from "../types";
 import type { DailyReport, TicketTypeKey } from "../types";
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip);
 
 const TIME_SLOTS = [
   { value: "10:30", label: "A（10:30）" },
@@ -149,6 +159,19 @@ export default function DailyReportPage() {
     const dayReports = reports.filter((r) => r.date === form.date);
     const taxin = dayReports.reduce((s, r) => s + (r.revenue_taxin ?? 0), 0);
     return Math.floor(taxin / 1.1);
+  }, [reports, form.date]);
+
+  // Daily mobilization by movie
+  const dailyMobilByMovie = useMemo(() => {
+    const dayReports = reports.filter((r) => r.date === form.date);
+    const map = new Map<string, number>();
+    for (const r of dayReports) {
+      const title = r.title ?? "不明";
+      map.set(title, (map.get(title) ?? 0) + (r.mobilization ?? 0));
+    }
+    return Array.from(map, ([title, count]) => ({ title, count })).sort(
+      (a, b) => b.count - a.count
+    );
   }, [reports, form.date]);
 
   // Ticket total
@@ -506,6 +529,42 @@ export default function DailyReportPage() {
             </div>
           );
         })()}
+        <div className="bg-card border border-card-border rounded-2xl p-5">
+          <p className="text-xs text-sub mb-3">今日の作品別動員数</p>
+          {dailyMobilByMovie.length === 0 ? (
+            <p className="text-sm text-sub text-center py-4">データなし</p>
+          ) : (
+            <Bar
+              data={{
+                labels: dailyMobilByMovie.map((d) => d.title),
+                datasets: [
+                  {
+                    data: dailyMobilByMovie.map((d) => d.count),
+                    backgroundColor: "#c8861a",
+                    borderRadius: 4,
+                  },
+                ],
+              }}
+              options={{
+                indexAxis: "y",
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false }, tooltip: { enabled: true } },
+                scales: {
+                  x: {
+                    ticks: { color: "#a08860", stepSize: 1 },
+                    grid: { color: "rgba(255,180,60,0.06)" },
+                  },
+                  y: {
+                    ticks: { color: "#f5ead8", font: { size: 11 } },
+                    grid: { display: false },
+                  },
+                },
+              }}
+              height={Math.max(dailyMobilByMovie.length * 32, 80)}
+            />
+          )}
+        </div>
       </div>
       </div>
 
