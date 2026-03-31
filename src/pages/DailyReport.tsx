@@ -175,19 +175,17 @@ export default function DailyReportPage() {
     );
   }, [reports, form.date]);
 
-  // 2-week trend data
+  // 2-week trend data (only days with revenue > 0)
   const trendData = useMemo(() => {
+    const weekdays = ["日", "月", "火", "水", "木", "金", "土"];
     const days: string[] = [];
-    const today = new Date(form.date + "T00:00:00");
+    const baseDate = new Date(form.date + "T00:00:00");
     for (let i = 13; i >= 0; i--) {
-      const d = new Date(today);
+      const d = new Date(baseDate);
       d.setDate(d.getDate() - i);
       days.push(d.toISOString().split("T")[0]);
     }
-    const labels = days.map((d) => {
-      const dt = new Date(d + "T00:00:00");
-      return `${dt.getMonth() + 1}/${dt.getDate()}`;
-    });
+    const labels: string[] = [];
     const revenue: number[] = [];
     const mobil: number[] = [];
     const salary: number[] = [];
@@ -195,7 +193,10 @@ export default function DailyReportPage() {
     for (const d of days) {
       const dayR = reports.filter((r) => r.date === d);
       const taxin = dayR.reduce((s, r) => s + (r.revenue_taxin ?? 0), 0);
+      if (taxin === 0) continue;
       const taxout = Math.floor(taxin / 1.1);
+      const dt = new Date(d + "T00:00:00");
+      labels.push(`${dt.getMonth() + 1}/${dt.getDate()}(${weekdays[dt.getDay()]})`);
       const m = dayR.reduce((s, r) => s + (r.mobilization ?? 0), 0);
       const sal = dayR.reduce((s, r) => s + (r.salary ?? 0), 0);
       revenue.push(taxout);
@@ -316,17 +317,7 @@ export default function DailyReportPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-baseline justify-between">
-        <h2 className="text-2xl font-bold text-cream">日報登録</h2>
-        <p className="text-3xl font-bold text-accent">
-          {new Date(form.date + "T00:00:00").toLocaleDateString("ja-JP", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-            weekday: "short",
-          })}
-        </p>
-      </div>
+      <h2 className="text-2xl font-bold text-cream">日報登録</h2>
 
       <div className="flex gap-6">
       {/* Registration form */}
@@ -505,6 +496,14 @@ export default function DailyReportPage() {
 
       {/* Daily summary cards */}
       <div className="flex-1 space-y-4 pt-0">
+        <p className="text-2xl font-bold text-accent">
+          {new Date(form.date + "T00:00:00").toLocaleDateString("ja-JP", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+            weekday: "short",
+          })}
+        </p>
         <div className="bg-card border border-card-border rounded-2xl p-5">
           <p className="text-xs text-sub mb-2">売上（税抜）</p>
           <p className="text-2xl font-bold text-cream">
@@ -557,6 +556,25 @@ export default function DailyReportPage() {
                     },
                   ],
                 }}
+                plugins={[{
+                  id: "barLabels",
+                  afterDatasetsDraw(chart) {
+                    const ctx = chart.ctx;
+                    chart.data.datasets.forEach((ds, i) => {
+                      const meta = chart.getDatasetMeta(i);
+                      meta.data.forEach((bar, j) => {
+                        const v = ds.data[j] as number;
+                        if (v > 0) {
+                          ctx.fillStyle = "#f5ead8";
+                          ctx.font = "11px sans-serif";
+                          ctx.textAlign = "left";
+                          ctx.textBaseline = "middle";
+                          ctx.fillText(`${v}人`, bar.x + 4, bar.y);
+                        }
+                      });
+                    });
+                  },
+                }]}
                 options={{
                   indexAxis: "y",
                   responsive: true,
