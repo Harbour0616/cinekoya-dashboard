@@ -25,6 +25,14 @@ const TIME_SLOTS = [
   { value: "20:30", label: "E（20:30）" },
 ];
 
+const TIME_SLOT_SHORT: Record<string, string> = {
+  "10:30": "A",
+  "13:00": "B",
+  "15:30": "C",
+  "18:00": "D",
+  "20:30": "E",
+};
+
 const today = () => new Date().toISOString().split("T")[0];
 
 interface TicketForm {
@@ -788,11 +796,12 @@ export default function DailyReportPage() {
                                 className="border-b border-card-border/30 bg-white/[0.01]"
                               >
                                 <td className="py-1.5 pl-8 pr-3 text-sub">{r.title ?? "—"}</td>
+                                <td className="py-1.5 px-3 text-center text-sub text-xs">{TIME_SLOT_SHORT[r.time_slot ?? ""] ?? r.time_slot ?? ""}</td>
                                 <td className="py-1.5 px-3 text-right text-sub">{(r.mobilization ?? 0).toLocaleString()}人</td>
+                                <td className="py-1.5 px-3 text-right text-sub">¥{(r.revenue_taxin ?? 0).toLocaleString()}</td>
                                 <td className="py-1.5 px-3 text-right text-sub">¥{taxout.toLocaleString()}</td>
-                                <td className="py-1.5 px-3 text-right text-sub text-xs">{r.time_slot ?? ""}</td>
                                 <td className="py-1.5 px-3" colSpan={2}></td>
-                                <td className="py-1.5 px-3" colSpan={2}>
+                                <td className="py-1.5 px-3">
                                   <div className="flex justify-end gap-1">
                                     <button
                                       onClick={(e) => { e.stopPropagation(); handleEdit(r); }}
