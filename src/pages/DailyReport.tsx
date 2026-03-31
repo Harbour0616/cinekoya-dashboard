@@ -430,7 +430,7 @@ export default function DailyReportPage() {
                       ticketRefs.current[i + 1]?.focus();
                     }
                   }}
-                  className="w-full bg-white/[0.03] border border-card-border rounded-lg px-3 py-1.5 text-sm text-cream outline-none focus:border-accent/40 transition-colors no-spinner"
+                  className="w-full bg-white/[0.03] border border-card-border rounded-lg px-3 py-2 text-sm text-cream outline-none focus:border-accent/40 transition-colors no-spinner"
                   placeholder="0"
                 />
               </div>
