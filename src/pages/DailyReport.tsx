@@ -546,7 +546,7 @@ export default function DailyReportPage() {
           {dailyMobilByMovie.length === 0 ? (
             <p className="text-sm text-sub text-center py-4">データなし</p>
           ) : (
-            <div className="w-full" style={{ aspectRatio: `${Math.max(dailyMobilByMovie.length, 2)} / 1` }}>
+            <div className="w-full" style={{ height: 200 }}>
               <Bar
                 data={{
                   labels: dailyMobilByMovie.map((d) => d.title),
@@ -599,7 +599,7 @@ export default function DailyReportPage() {
         </div>
         <div className="bg-card border border-card-border rounded-2xl p-5">
           <p className="text-xs text-sub mb-3">過去2週間のトレンド</p>
-          <div className="w-full max-h-[250px]">
+          <div className="w-full" style={{ height: 200 }}>
             <Line
               data={{
                 labels: trendData.labels,
