@@ -39,35 +39,56 @@ export default function MoviesMaster() {
 
   const fetchMovies = async () => {
     setLoading(true);
-    const [moviesRes, reportsRes] = await Promise.all([
-      supabase
-        .from("movies")
-        .select("*")
-        .order("start_date", { ascending: false, nullsFirst: false }),
-      supabase
-        .from("daily_reports")
-        .select("title, mobilization, revenue_taxin, revenue_taxout"),
-    ]);
+
+    // Fetch movies
+    const moviesRes = await supabase
+      .from("movies")
+      .select("*")
+      .order("start_date", { ascending: false, nullsFirst: false });
     if (!moviesRes.error && moviesRes.data) setMovies(moviesRes.data);
+
+    // Fetch ALL daily_reports (paginate to bypass 1000-row default limit)
+    const allReports: { title: string | null; mobilization: number | null; revenue_taxin: number | null; revenue_taxout: number | null }[] = [];
+    const PAGE = 1000;
+    let from = 0;
+    let done = false;
+    while (!done) {
+      const { data, error } = await supabase
+        .from("daily_reports")
+        .select("title, mobilization, revenue_taxin, revenue_taxout")
+        .range(from, from + PAGE - 1);
+      if (error || !data || data.length === 0) {
+        done = true;
+      } else {
+        allReports.push(...data);
+        if (data.length < PAGE) done = true;
+        else from += PAGE;
+      }
+    }
+
+    // Debug: log sample titles for mismatch investigation
+    console.log("[MoviesMaster] movies titles (5):", moviesRes.data?.slice(0, 5).map((m) => m.title));
+    console.log("[MoviesMaster] daily_reports titles (5):", [...new Set(allReports.map((r) => r.title))].slice(0, 5));
+    console.log("[MoviesMaster] daily_reports total rows:", allReports.length);
 
     // Aggregate daily_reports by title
     const map = new Map<string, TitleStats>();
-    if (!reportsRes.error && reportsRes.data) {
-      for (const r of reportsRes.data) {
-        if (!r.title) continue;
-        const entry = map.get(r.title) ?? {
-          count: 0,
-          mobilization: 0,
-          revenue_taxin: 0,
-          revenue_taxout: 0,
-        };
-        entry.count += 1;
-        entry.mobilization += r.mobilization ?? 0;
-        entry.revenue_taxin += r.revenue_taxin ?? 0;
-        entry.revenue_taxout += r.revenue_taxout ?? 0;
-        map.set(r.title, entry);
-      }
+    for (const r of allReports) {
+      if (!r.title) continue;
+      const entry = map.get(r.title) ?? {
+        count: 0,
+        mobilization: 0,
+        revenue_taxin: 0,
+        revenue_taxout: 0,
+      };
+      entry.count += 1;
+      entry.mobilization += r.mobilization ?? 0;
+      entry.revenue_taxin += r.revenue_taxin ?? 0;
+      entry.revenue_taxout += r.revenue_taxout ?? 0;
+      map.set(r.title, entry);
     }
+
+    console.log("[MoviesMaster] statsMap size:", map.size);
     setStatsMap(map);
     setLoading(false);
   };
