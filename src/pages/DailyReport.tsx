@@ -170,6 +170,22 @@ export default function DailyReportPage() {
     });
   };
 
+  const periodTotals = useMemo(() => {
+    let mobil = 0, taxout = 0, sal = 0;
+    const dateSet = new Set<string>();
+    for (const r of filteredReports) {
+      mobil += r.mobilization ?? 0;
+      taxout += Math.floor((r.revenue_taxin ?? 0) / 1.1);
+      sal += r.salary ?? 0;
+      if (r.date) dateSet.add(r.date);
+    }
+    const rights = Math.floor(taxout * 0.5);
+    const days = dateSet.size;
+    const fixed = 70000 * days;
+    const profit = taxout - rights - sal - fixed;
+    return { mobil, taxout, rights, sal, fixed, profit, days };
+  }, [filteredReports]);
+
   const totalPages = Math.ceil(groupedReports.length / PAGE_SIZE);
   const pagedGroups = groupedReports.slice(
     page * PAGE_SIZE,
@@ -830,6 +846,21 @@ export default function DailyReportPage() {
                     );
                   })}
                 </tbody>
+                <tfoot>
+                  <tr className="border-t-2 border-accent/30 bg-white/[0.04]">
+                    <td className="py-3 px-3 text-cream font-bold">合計（{periodTotals.days}日間）</td>
+                    <td></td>
+                    <td className="py-3 px-3 text-right text-cream font-bold">{periodTotals.mobil.toLocaleString()}人</td>
+                    <td className="py-3 px-3 text-right text-cream font-bold">¥{periodTotals.taxout.toLocaleString()}</td>
+                    <td className="py-3 px-3 text-right text-cream font-bold">¥{periodTotals.rights.toLocaleString()}</td>
+                    <td className="py-3 px-3 text-right text-cream font-bold">¥{periodTotals.sal.toLocaleString()}</td>
+                    <td className="py-3 px-3 text-right text-cream font-bold">¥{periodTotals.fixed.toLocaleString()}</td>
+                    <td className={`py-3 px-3 text-right font-bold ${periodTotals.profit >= 0 ? "text-green-400" : "text-red-400"}`}>
+                      ¥{periodTotals.profit.toLocaleString()}
+                    </td>
+                    <td></td>
+                  </tr>
+                </tfoot>
               </table>
             </div>
 
