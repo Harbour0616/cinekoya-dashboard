@@ -59,10 +59,13 @@ export default function CSVImport({ onComplete }: { onComplete: () => void }) {
           profit: row.profit ? parseInt(row.profit) : null,
         }));
 
-        // Insert in batches of 100
+        // Upsert in batches of 100
         for (let i = 0; i < rows.length; i += 100) {
           const batch = rows.slice(i, i + 100);
-          const { error } = await supabase.from("daily_reports").insert(batch);
+          const { error } = await supabase.from("daily_reports").upsert(batch, {
+            onConflict: "title,date,time_slot",
+            ignoreDuplicates: false,
+          });
           if (error) {
             console.error("Insert error:", error);
             errorCount += batch.length;

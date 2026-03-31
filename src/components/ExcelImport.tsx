@@ -157,16 +157,8 @@ export default function ExcelImport({ onComplete }: { onComplete: () => void }) 
         ignoreDuplicates: false,
       });
       if (error) {
-        // Fallback to insert if upsert constraint doesn't exist
-        const { error: insertErr } = await supabase
-          .from("daily_reports")
-          .insert(batch);
-        if (insertErr) {
-          console.error("Insert error:", insertErr);
-          errorCount += batch.length;
-        } else {
-          success += batch.length;
-        }
+        console.error("Upsert error:", error);
+        errorCount += batch.length;
       } else {
         success += batch.length;
       }
