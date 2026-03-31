@@ -332,7 +332,7 @@ export default function DailyReportPage() {
       {/* Registration form */}
       <form
         onSubmit={handleSubmit}
-        className="bg-card border border-card-border rounded-2xl p-5 space-y-4 w-1/3 shrink-0"
+        className="bg-card border border-card-border rounded-2xl p-5 space-y-4 w-1/3 min-w-0"
       >
         {/* 日付 */}
         <div>
@@ -545,7 +545,7 @@ export default function DailyReportPage() {
           {dailyMobilByMovie.length === 0 ? (
             <p className="text-sm text-sub text-center py-4">データなし</p>
           ) : (
-            <div style={{ height: Math.min(dailyMobilByMovie.length * 40, 200) }}>
+            <div className="w-full" style={{ aspectRatio: `${Math.max(dailyMobilByMovie.length, 2)} / 1` }}>
               <Bar
                 data={{
                   labels: dailyMobilByMovie.map((d) => d.title),
@@ -579,7 +579,7 @@ export default function DailyReportPage() {
         </div>
         <div className="bg-card border border-card-border rounded-2xl p-5">
           <p className="text-xs text-sub mb-3">過去2週間のトレンド</p>
-          <div style={{ height: 220 }}>
+          <div className="w-full" style={{ aspectRatio: "2 / 1" }}>
             <Line
               data={{
                 labels: trendData.labels,
@@ -724,7 +724,7 @@ export default function DailyReportPage() {
                       <td className="py-2 px-3 text-cream whitespace-nowrap">
                         {r.date ?? "—"}
                       </td>
-                      <td className="py-2 px-3 text-cream font-medium max-w-[200px] truncate">
+                      <td className="py-2 px-3 text-cream font-medium max-w-[30vw] truncate">
                         {r.title ?? "—"}
                       </td>
                       <td className="py-2 px-3 text-cream">{r.time_slot ?? "—"}</td>
