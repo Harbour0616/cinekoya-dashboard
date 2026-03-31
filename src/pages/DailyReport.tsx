@@ -432,7 +432,7 @@ export default function DailyReportPage() {
         <div className="flex items-center gap-3">
           <button
             type="submit"
-            disabled={saving || !form.title.trim()}
+            disabled={saving}
             className="px-6 py-2.5 bg-accent hover:bg-accent/80 disabled:opacity-50 text-bg font-bold rounded-xl transition-colors text-sm"
           >
             {saving ? "保存中..." : editingId ? "更新する" : "登録する"}
