@@ -225,7 +225,7 @@ export default function DailyReportPage() {
       {/* Registration form */}
       <form
         onSubmit={handleSubmit}
-        className="bg-card border border-card-border rounded-2xl p-5 space-y-4"
+        className="bg-card border border-card-border rounded-2xl p-5 space-y-4 max-w-[33%]"
       >
         <h3 className="text-sm font-bold text-cream">
           {editingId ? "日報を編集" : "日報を登録"}
