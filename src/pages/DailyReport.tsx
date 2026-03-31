@@ -370,10 +370,10 @@ export default function DailyReportPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-6">
-        <h2 className="text-2xl font-bold text-cream w-1/3">日報登録</h2>
-        <p className="text-2xl font-bold text-accent flex-1">
+    <div className="space-y-[1.5vw]">
+      <div className="flex items-center gap-[1.5vw]">
+        <h2 className="text-[1.7vw] font-bold text-cream w-1/3">日報登録</h2>
+        <p className="text-[1.7vw] font-bold text-accent flex-1">
           {new Date(form.date + "T00:00:00").toLocaleDateString("ja-JP", {
             year: "numeric",
             month: "long",
@@ -383,30 +383,30 @@ export default function DailyReportPage() {
         </p>
       </div>
 
-      <div className="flex gap-6">
+      <div className="flex gap-[1.5vw]">
       {/* Registration form */}
       <form
         onSubmit={handleSubmit}
-        className="bg-card border border-card-border rounded-2xl p-5 space-y-4 w-1/3 min-w-0"
+        className="bg-card border border-card-border rounded-[1vw] p-[1.2vw] space-y-[1vw] w-1/3 min-w-0"
       >
         {/* 日付 */}
         <div>
-          <label className="block text-xs text-sub mb-1">日付</label>
+          <label className="block text-[0.85vw] text-sub mb-[0.3vw]">日付</label>
           <input
             type="date"
             value={form.date}
             onChange={(e) => setForm({ ...form, date: e.target.value })}
-            className="w-full bg-white/[0.03] border border-card-border rounded-lg px-3 py-2 text-sm text-cream outline-none focus:border-accent/40 transition-colors [color-scheme:dark]"
+            className="w-full bg-white/[0.03] border border-card-border rounded-lg px-[0.8vw] py-[0.5vw] text-[0.95vw] text-cream outline-none focus:border-accent/40 transition-colors [color-scheme:dark]"
           />
         </div>
 
         {/* 時間帯 */}
         <div>
-          <label className="block text-xs text-sub mb-1">時間帯</label>
+          <label className="block text-[0.85vw] text-sub mb-[0.3vw]">時間帯</label>
           <select
             value={form.time_slot}
             onChange={(e) => setForm({ ...form, time_slot: e.target.value })}
-            className="w-full bg-white/[0.03] border border-card-border rounded-lg px-3 py-2 text-sm text-cream outline-none focus:border-accent/40 transition-colors [color-scheme:dark]"
+            className="w-full bg-white/[0.03] border border-card-border rounded-lg px-[0.8vw] py-[0.5vw] text-[0.95vw] text-cream outline-none focus:border-accent/40 transition-colors [color-scheme:dark]"
           >
             {TIME_SLOTS.map((s) => (
               <option key={s.value} value={s.value} className="bg-bg text-cream">
@@ -418,13 +418,13 @@ export default function DailyReportPage() {
 
         {/* 上映作品 */}
         <div ref={titleRef} className="relative">
-          <label className="block text-xs text-sub mb-1">
+          <label className="block text-[0.85vw] text-sub mb-[0.3vw]">
             上映作品 <span className="text-red-400">*</span>
           </label>
           <div className="relative">
             <Search
               size={14}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-sub"
+              className="absolute left-[0.8vw] top-1/2 -translate-y-1/2 text-sub"
             />
             <input
               type="text"
@@ -438,11 +438,11 @@ export default function DailyReportPage() {
               onFocus={() => setShowMovieDropdown(true)}
               onBlur={() => setTimeout(() => setShowMovieDropdown(false), 200)}
               placeholder="作品名を検索..."
-              className="w-full bg-white/[0.03] border border-card-border rounded-lg pl-9 pr-3 py-2 text-sm text-cream placeholder:text-sub/60 outline-none focus:border-accent/40 transition-colors"
+              className="w-full bg-white/[0.03] border border-card-border rounded-lg pl-[2vw] pr-[0.8vw] py-[0.5vw] text-[0.95vw] text-cream placeholder:text-sub/60 outline-none focus:border-accent/40 transition-colors"
             />
           </div>
           {showMovieDropdown && filteredMovies.length > 0 && (
-            <div className="absolute z-10 top-full left-0 right-0 mt-1 bg-[#2a1f10] border border-card-border rounded-lg max-h-48 overflow-y-auto shadow-lg">
+            <div className="absolute z-10 top-full left-0 right-0 mt-[0.3vw] bg-[#2a1f10] border border-card-border rounded-lg max-h-[15vw] overflow-y-auto shadow-lg">
               {filteredMovies.slice(0, 30).map((t) => (
                 <button
                   key={t}
@@ -453,7 +453,7 @@ export default function DailyReportPage() {
                     setShowMovieDropdown(false);
                     setTitleError(false);
                   }}
-                  className="w-full text-left px-3 py-2 text-sm text-cream hover:bg-accent/10 transition-colors"
+                  className="w-full text-left px-[0.8vw] py-[0.5vw] text-[0.95vw] text-cream hover:bg-accent/10 transition-colors"
                 >
                   {t}
                 </button>
@@ -461,21 +461,21 @@ export default function DailyReportPage() {
             </div>
           )}
           {titleError && (
-            <p className="text-xs text-red-400 mt-1">作品名を選択してください</p>
+            <p className="text-[0.85vw] text-red-400 mt-[0.3vw]">作品名を選択してください</p>
           )}
         </div>
 
         {/* 券種別（縦一列） */}
         <div>
-          <label className="block text-xs text-sub mb-2">
+          <label className="block text-[0.85vw] text-sub mb-[0.5vw]">
             動員数（券種別）
           </label>
-          <div className="space-y-3">
+          <div className="space-y-[0.7vw]">
             {TICKET_TYPES.map((t, i) => (
               <div key={t.key}>
-                <label className="block text-xs text-sub mb-1 flex items-center gap-1.5">
+                <label className="block text-[0.85vw] text-sub mb-[0.3vw] flex items-center gap-[0.4vw]">
                   <span
-                    className="w-2.5 h-2.5 rounded-sm inline-block"
+                    className="w-[0.7vw] h-[0.7vw] rounded-sm inline-block"
                     style={{ backgroundColor: t.color }}
                   />
                   {t.label}
@@ -494,7 +494,7 @@ export default function DailyReportPage() {
                       ticketRefs.current[i + 1]?.focus();
                     }
                   }}
-                  className="w-full bg-white/[0.03] border border-card-border rounded-lg px-3 py-2 text-sm text-cream outline-none focus:border-accent/40 transition-colors no-spinner"
+                  className="w-full bg-white/[0.03] border border-card-border rounded-lg px-[0.8vw] py-[0.5vw] text-[0.95vw] text-cream outline-none focus:border-accent/40 transition-colors no-spinner"
                   placeholder="0"
                 />
               </div>
@@ -504,36 +504,36 @@ export default function DailyReportPage() {
 
         {/* 備考・メモ */}
         <div>
-          <label className="block text-xs text-sub mb-1">備考・メモ</label>
+          <label className="block text-[0.85vw] text-sub mb-[0.3vw]">備考・メモ</label>
           <textarea
             value={form.notes}
             onChange={(e) => setForm({ ...form, notes: e.target.value })}
             rows={2}
-            className="w-full bg-white/[0.03] border border-card-border rounded-lg px-3 py-2 text-sm text-cream placeholder:text-sub/60 outline-none focus:border-accent/40 transition-colors resize-none"
+            className="w-full bg-white/[0.03] border border-card-border rounded-lg px-[0.8vw] py-[0.5vw] text-[0.95vw] text-cream placeholder:text-sub/60 outline-none focus:border-accent/40 transition-colors resize-none"
             placeholder="備考を入力"
           />
         </div>
 
         {/* 売上（税込・自動計算） */}
         <div>
-          <label className="block text-xs text-sub mb-1">
+          <label className="block text-[0.85vw] text-sub mb-[0.3vw]">
             売上（税込・自動計算）
-            <span className="ml-2 text-accent font-bold">合計: {ticketTotal}人</span>
+            <span className="ml-[0.5vw] text-accent font-bold">合計: {ticketTotal}人</span>
           </label>
           <input
             type="text"
             readOnly
             value={`¥${calculatedRevenue.toLocaleString()}`}
-            className="w-full bg-white/[0.06] border border-card-border rounded-lg px-3 py-2 text-sm text-cream outline-none cursor-default"
+            className="w-full bg-white/[0.06] border border-card-border rounded-lg px-[0.8vw] py-[0.5vw] text-[0.95vw] text-cream outline-none cursor-default"
           />
         </div>
 
         {/* Buttons */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-[0.8vw]">
           <button
             type="submit"
             disabled={saving}
-            className="px-6 py-2.5 bg-accent hover:bg-accent/80 disabled:opacity-50 text-bg font-bold rounded-xl transition-colors text-sm"
+            className="px-[1.5vw] py-[0.6vw] bg-accent hover:bg-accent/80 disabled:opacity-50 text-bg font-bold rounded-xl transition-colors text-[0.95vw]"
           >
             {saving ? "保存中..." : editingId ? "更新する" : "登録する"}
           </button>
@@ -541,14 +541,14 @@ export default function DailyReportPage() {
             <button
               type="button"
               onClick={handleCancel}
-              className="px-6 py-2.5 bg-white/[0.05] border border-card-border text-sub hover:text-cream rounded-xl transition-colors text-sm"
+              className="px-[1.5vw] py-[0.6vw] bg-white/[0.05] border border-card-border text-sub hover:text-cream rounded-xl transition-colors text-[0.95vw]"
             >
               キャンセル
             </button>
           )}
           {saveMsg && (
             <span
-              className={`text-sm ${
+              className={`text-[0.95vw] ${
                 saveMsg.startsWith("エラー") ? "text-red-400" : "text-green-400"
               }`}
             >
@@ -559,45 +559,45 @@ export default function DailyReportPage() {
       </form>
 
       {/* Daily summary cards */}
-      <div className="flex-1 space-y-4 pt-0">
-        <div className="bg-card border border-card-border rounded-2xl p-5">
-          <p className="text-xs text-sub mb-2">売上（税抜）</p>
-          <p className="text-2xl font-bold text-cream">
+      <div className="flex-1 min-w-0 space-y-[1vw] pt-0">
+        <div className="bg-card border border-card-border rounded-[1vw] p-[1.2vw]">
+          <p className="text-[0.85vw] text-sub mb-[0.4vw]">売上（税抜）</p>
+          <p className="text-[1.7vw] font-bold text-cream">
             ¥{dailyRevenueTaxout.toLocaleString()}
           </p>
         </div>
-        <div className="bg-card border border-card-border rounded-2xl p-5">
-          <p className="text-xs text-sub mb-2">上映権料</p>
-          <p className="text-2xl font-bold text-cream">
+        <div className="bg-card border border-card-border rounded-[1vw] p-[1.2vw]">
+          <p className="text-[0.85vw] text-sub mb-[0.4vw]">上映権料</p>
+          <p className="text-[1.7vw] font-bold text-cream">
             ¥{Math.floor(dailyRevenueTaxout * 0.5).toLocaleString()}
           </p>
         </div>
-        <div className="bg-card border border-card-border rounded-2xl p-5">
-          <p className="text-xs text-sub mb-2">給与</p>
-          <p className="text-2xl font-bold text-cream">
+        <div className="bg-card border border-card-border rounded-[1vw] p-[1.2vw]">
+          <p className="text-[0.85vw] text-sub mb-[0.4vw]">給与</p>
+          <p className="text-[1.7vw] font-bold text-cream">
             ¥{attendanceSalary.toLocaleString()}
           </p>
         </div>
-        <div className="bg-card border border-card-border rounded-2xl p-5">
-          <p className="text-xs text-sub mb-2">固定費</p>
-          <p className="text-2xl font-bold text-cream">
+        <div className="bg-card border border-card-border rounded-[1vw] p-[1.2vw]">
+          <p className="text-[0.85vw] text-sub mb-[0.4vw]">固定費</p>
+          <p className="text-[1.7vw] font-bold text-cream">
             ¥70,000
           </p>
         </div>
         {(() => {
           const profit = dailyRevenueTaxout - Math.floor(dailyRevenueTaxout * 0.5) - attendanceSalary - 70000;
           return (
-            <div className="bg-card border border-card-border rounded-2xl p-5">
-              <p className="text-xs text-sub mb-2">利益</p>
-              <p className={`text-2xl font-bold ${profit >= 0 ? "text-green-400" : "text-red-400"}`}>
+            <div className="bg-card border border-card-border rounded-[1vw] p-[1.2vw]">
+              <p className="text-[0.85vw] text-sub mb-[0.4vw]">利益</p>
+              <p className={`text-[1.7vw] font-bold ${profit >= 0 ? "text-green-400" : "text-red-400"}`}>
                 ¥{profit.toLocaleString()}
               </p>
             </div>
           );
         })()}
-        <div className="bg-card border border-card-border rounded-2xl p-5">
-          <p className="text-xs text-sub mb-3">今日の作品別動員数</p>
-          <div className="w-full relative" style={{ height: 200 }}>
+        <div className="bg-card border border-card-border rounded-[1vw] p-[1.2vw]">
+          <p className="text-[0.85vw] text-sub mb-[0.7vw]">今日の作品別動員数</p>
+          <div className="w-full relative" style={{ height: "14vw" }}>
           {dailyMobilByMovie.length === 0 ? (
             <div className="absolute inset-0 flex items-center justify-center">
               <p className="text-sm text-sub">データなし</p>
@@ -653,9 +653,9 @@ export default function DailyReportPage() {
           )}
           </div>
         </div>
-        <div className="bg-card border border-card-border rounded-2xl p-5">
-          <p className="text-xs text-sub mb-3">過去2週間のトレンド</p>
-          <div className="w-full" style={{ height: 200 }}>
+        <div className="bg-card border border-card-border rounded-[1vw] p-[1.2vw]">
+          <p className="text-[0.85vw] text-sub mb-[0.7vw]">過去2週間のトレンド</p>
+          <div className="w-full" style={{ height: "14vw" }}>
             <Line
               data={{
                 labels: trendData.labels,
@@ -731,11 +731,11 @@ export default function DailyReportPage() {
       </div>
 
       {/* Report list */}
-      <div className="bg-card border border-card-border rounded-2xl p-5 space-y-4">
-        <div className="flex items-center justify-between flex-wrap gap-3">
-          <h3 className="text-sm font-bold text-cream">
+      <div className="bg-card border border-card-border rounded-[1vw] p-[1.2vw] space-y-[1vw]">
+        <div className="flex items-center justify-between flex-wrap gap-[0.8vw]">
+          <h3 className="text-[0.95vw] font-bold text-cream">
             日報一覧
-            <span className="ml-2 text-accent font-normal">
+            <span className="ml-[0.5vw] text-accent font-normal">
               {filteredReports.length}件
             </span>
           </h3>
@@ -745,7 +745,7 @@ export default function DailyReportPage() {
               setMonthFilter(e.target.value);
               setPage(0);
             }}
-            className="bg-white/[0.03] border border-card-border rounded-lg px-3 py-1.5 text-sm text-cream outline-none focus:border-accent/40 transition-colors [color-scheme:dark]"
+            className="bg-white/[0.03] border border-card-border rounded-lg px-[0.8vw] py-[0.4vw] text-[0.95vw] text-cream outline-none focus:border-accent/40 transition-colors [color-scheme:dark]"
           >
             <option value="" className="bg-bg text-cream">
               全期間
@@ -765,18 +765,18 @@ export default function DailyReportPage() {
         ) : (
           <>
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full text-[0.95vw]">
                 <thead>
                   <tr className="border-b border-card-border">
-                    <th className="text-left py-2 px-3 text-sub font-medium">日付</th>
-                    <th className="w-10"></th>
-                    <th className="text-right py-2 px-3 text-sub font-medium">動員数</th>
-                    <th className="text-right py-2 px-3 text-sub font-medium">売上（税抜）</th>
-                    <th className="text-right py-2 px-3 text-sub font-medium">上映権料</th>
-                    <th className="text-right py-2 px-3 text-sub font-medium">給与</th>
-                    <th className="text-right py-2 px-3 text-sub font-medium">固定費</th>
-                    <th className="text-right py-2 px-3 text-sub font-medium">利益</th>
-                    <th className="w-10"></th>
+                    <th className="text-left py-[0.5vw] px-[0.8vw] text-sub font-medium">日付</th>
+                    <th className="w-[2.5vw]"></th>
+                    <th className="text-right py-[0.5vw] px-[0.8vw] text-sub font-medium">動員数</th>
+                    <th className="text-right py-[0.5vw] px-[0.8vw] text-sub font-medium">売上（税抜）</th>
+                    <th className="text-right py-[0.5vw] px-[0.8vw] text-sub font-medium">上映権料</th>
+                    <th className="text-right py-[0.5vw] px-[0.8vw] text-sub font-medium">給与</th>
+                    <th className="text-right py-[0.5vw] px-[0.8vw] text-sub font-medium">固定費</th>
+                    <th className="text-right py-[0.5vw] px-[0.8vw] text-sub font-medium">利益</th>
+                    <th className="w-[2.5vw]"></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -793,17 +793,17 @@ export default function DailyReportPage() {
                           className="border-b border-card-border hover:bg-white/[0.02] transition-colors cursor-pointer"
                           onClick={() => toggleDate(date)}
                         >
-                          <td className="py-2.5 px-3 text-cream font-bold whitespace-nowrap">{date}</td>
+                          <td className="py-[0.6vw] px-[0.8vw] text-cream font-bold whitespace-nowrap">{date}</td>
                           <td></td>
-                          <td className="py-2.5 px-3 text-right text-cream">{totalMobil.toLocaleString()}人</td>
-                          <td className="py-2.5 px-3 text-right text-cream">¥{totalTaxout.toLocaleString()}</td>
-                          <td className="py-2.5 px-3 text-right text-cream">¥{totalRights.toLocaleString()}</td>
-                          <td className="py-2.5 px-3 text-right text-sub">¥{totalSal.toLocaleString()}</td>
-                          <td className="py-2.5 px-3 text-right text-sub">¥70,000</td>
-                          <td className={`py-2.5 px-3 text-right font-medium ${totalProfit >= 0 ? "text-green-400" : "text-red-400"}`}>
+                          <td className="py-[0.6vw] px-[0.8vw] text-right text-cream">{totalMobil.toLocaleString()}人</td>
+                          <td className="py-[0.6vw] px-[0.8vw] text-right text-cream">¥{totalTaxout.toLocaleString()}</td>
+                          <td className="py-[0.6vw] px-[0.8vw] text-right text-cream">¥{totalRights.toLocaleString()}</td>
+                          <td className="py-[0.6vw] px-[0.8vw] text-right text-sub">¥{totalSal.toLocaleString()}</td>
+                          <td className="py-[0.6vw] px-[0.8vw] text-right text-sub">¥70,000</td>
+                          <td className={`py-[0.6vw] px-[0.8vw] text-right font-medium ${totalProfit >= 0 ? "text-green-400" : "text-red-400"}`}>
                             ¥{totalProfit.toLocaleString()}
                           </td>
-                          <td className="py-2.5 px-1 text-sub">
+                          <td className="py-[0.6vw] px-[0.3vw] text-sub">
                             {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
                           </td>
                         </tr>
@@ -815,15 +815,15 @@ export default function DailyReportPage() {
                                 key={r.id}
                                 className="border-b border-card-border/30 bg-white/[0.01]"
                               >
-                                <td className="py-1.5 pl-8 pr-3 text-sub">{r.title ?? "—"}</td>
-                                <td className="py-1.5 px-1 text-center text-sub text-xs">{TIME_SLOT_SHORT[r.time_slot ?? ""] ?? r.time_slot ?? ""}</td>
-                                <td className="py-1.5 px-3 text-right text-sub">{(r.mobilization ?? 0).toLocaleString()}人</td>
-                                <td className="py-1.5 px-3 text-right text-sub">¥{taxout.toLocaleString()}</td>
-                                <td className="py-1.5 px-3 text-center text-sub/40">-</td>
-                                <td className="py-1.5 px-3 text-center text-sub/40">-</td>
-                                <td className="py-1.5 px-3 text-center text-sub/40">-</td>
-                                <td className="py-1.5 px-3 text-center text-sub/40">-</td>
-                                <td className="py-1.5 px-3">
+                                <td className="py-[0.4vw] pl-[2vw] pr-[0.8vw] text-sub">{r.title ?? "—"}</td>
+                                <td className="py-[0.4vw] px-[0.3vw] text-center text-sub text-[0.85vw]">{TIME_SLOT_SHORT[r.time_slot ?? ""] ?? r.time_slot ?? ""}</td>
+                                <td className="py-[0.4vw] px-[0.8vw] text-right text-sub">{(r.mobilization ?? 0).toLocaleString()}人</td>
+                                <td className="py-[0.4vw] px-[0.8vw] text-right text-sub">¥{taxout.toLocaleString()}</td>
+                                <td className="py-[0.4vw] px-[0.8vw] text-center text-sub/40">-</td>
+                                <td className="py-[0.4vw] px-[0.8vw] text-center text-sub/40">-</td>
+                                <td className="py-[0.4vw] px-[0.8vw] text-center text-sub/40">-</td>
+                                <td className="py-[0.4vw] px-[0.8vw] text-center text-sub/40">-</td>
+                                <td className="py-[0.4vw] px-[0.8vw]">
                                   <div className="flex justify-end gap-1">
                                     <button
                                       onClick={(e) => { e.stopPropagation(); handleEdit(r); }}
@@ -850,14 +850,14 @@ export default function DailyReportPage() {
                 </tbody>
                 <tfoot>
                   <tr className="border-t-2 border-accent/30 bg-white/[0.04]">
-                    <td className="py-3 px-3 text-cream font-bold">合計（{periodTotals.days}日間）</td>
+                    <td className="py-[0.7vw] px-[0.8vw] text-cream font-bold">合計（{periodTotals.days}日間）</td>
                     <td></td>
-                    <td className="py-3 px-3 text-right text-cream font-bold">{periodTotals.mobil.toLocaleString()}人</td>
-                    <td className="py-3 px-3 text-right text-cream font-bold">¥{periodTotals.taxout.toLocaleString()}</td>
-                    <td className="py-3 px-3 text-right text-cream font-bold">¥{periodTotals.rights.toLocaleString()}</td>
-                    <td className="py-3 px-3 text-right text-cream font-bold">¥{periodTotals.sal.toLocaleString()}</td>
-                    <td className="py-3 px-3 text-right text-cream font-bold">¥{periodTotals.fixed.toLocaleString()}</td>
-                    <td className={`py-3 px-3 text-right font-bold ${periodTotals.profit >= 0 ? "text-green-400" : "text-red-400"}`}>
+                    <td className="py-[0.7vw] px-[0.8vw] text-right text-cream font-bold">{periodTotals.mobil.toLocaleString()}人</td>
+                    <td className="py-[0.7vw] px-[0.8vw] text-right text-cream font-bold">¥{periodTotals.taxout.toLocaleString()}</td>
+                    <td className="py-[0.7vw] px-[0.8vw] text-right text-cream font-bold">¥{periodTotals.rights.toLocaleString()}</td>
+                    <td className="py-[0.7vw] px-[0.8vw] text-right text-cream font-bold">¥{periodTotals.sal.toLocaleString()}</td>
+                    <td className="py-[0.7vw] px-[0.8vw] text-right text-cream font-bold">¥{periodTotals.fixed.toLocaleString()}</td>
+                    <td className={`py-[0.7vw] px-[0.8vw] text-right font-bold ${periodTotals.profit >= 0 ? "text-green-400" : "text-red-400"}`}>
                       ¥{periodTotals.profit.toLocaleString()}
                     </td>
                     <td></td>
@@ -868,21 +868,21 @@ export default function DailyReportPage() {
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="flex items-center justify-center gap-2 pt-2">
+              <div className="flex items-center justify-center gap-[0.5vw] pt-[0.5vw]">
                 <button
                   onClick={() => setPage((p) => Math.max(0, p - 1))}
                   disabled={page === 0}
-                  className="px-3 py-1 rounded-lg text-xs font-medium bg-white/[0.03] border border-card-border text-sub hover:text-cream disabled:opacity-30 transition-colors"
+                  className="px-[0.8vw] py-[0.3vw] rounded-lg text-[0.85vw] font-medium bg-white/[0.03] border border-card-border text-sub hover:text-cream disabled:opacity-30 transition-colors"
                 >
                   前へ
                 </button>
-                <span className="text-xs text-sub">
+                <span className="text-[0.85vw] text-sub">
                   {page + 1} / {totalPages}
                 </span>
                 <button
                   onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
                   disabled={page >= totalPages - 1}
-                  className="px-3 py-1 rounded-lg text-xs font-medium bg-white/[0.03] border border-card-border text-sub hover:text-cream disabled:opacity-30 transition-colors"
+                  className="px-[0.8vw] py-[0.3vw] rounded-lg text-[0.85vw] font-medium bg-white/[0.03] border border-card-border text-sub hover:text-cream disabled:opacity-30 transition-colors"
                 >
                   次へ
                 </button>
