@@ -1,18 +1,21 @@
 import { useEffect, useState, useMemo, useRef } from "react";
 import { Pencil, Trash2, Search } from "lucide-react";
-import { Bar } from "react-chartjs-2";
+import { Bar, Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
   BarElement,
+  PointElement,
+  LineElement,
   Tooltip,
+  Legend,
 } from "chart.js";
 import { supabase } from "../lib/supabase";
 import { TICKET_TYPES } from "../types";
 import type { DailyReport, TicketTypeKey } from "../types";
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip);
+ChartJS.register(CategoryScale, LinearScale, BarElement, PointElement, LineElement, Tooltip, Legend);
 
 const TIME_SLOTS = [
   { value: "10:30", label: "A（10:30）" },
@@ -176,6 +179,37 @@ export default function DailyReportPage() {
     return Array.from(map, ([title, count]) => ({ title, count })).sort(
       (a, b) => b.count - a.count
     );
+  }, [reports, form.date]);
+
+  // 2-week trend data
+  const trendData = useMemo(() => {
+    const days: string[] = [];
+    const today = new Date(form.date + "T00:00:00");
+    for (let i = 13; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      days.push(d.toISOString().split("T")[0]);
+    }
+    const labels = days.map((d) => {
+      const dt = new Date(d + "T00:00:00");
+      return `${dt.getMonth() + 1}/${dt.getDate()}`;
+    });
+    const revenue: number[] = [];
+    const mobil: number[] = [];
+    const salary: number[] = [];
+    const profit: number[] = [];
+    for (const d of days) {
+      const dayR = reports.filter((r) => r.date === d);
+      const taxin = dayR.reduce((s, r) => s + (r.revenue_taxin ?? 0), 0);
+      const taxout = Math.floor(taxin / 1.1);
+      const m = dayR.reduce((s, r) => s + (r.mobilization ?? 0), 0);
+      const sal = dayR.reduce((s, r) => s + (r.salary ?? 0), 0);
+      revenue.push(taxout);
+      mobil.push(m);
+      salary.push(sal);
+      profit.push(taxout - Math.floor(taxout * 0.5) - sal - 70000);
+    }
+    return { labels, revenue, mobil, salary, profit };
   }, [reports, form.date]);
 
   // Ticket total
@@ -586,6 +620,80 @@ export default function DailyReportPage() {
               />
             </div>
           )}
+        </div>
+        <div className="bg-card border border-card-border rounded-2xl p-5">
+          <p className="text-xs text-sub mb-3">過去2週間のトレンド</p>
+          <div style={{ height: 220 }}>
+            <Line
+              data={{
+                labels: trendData.labels,
+                datasets: [
+                  {
+                    label: "売上（税抜）",
+                    data: trendData.revenue,
+                    borderColor: "#5b9bd5",
+                    backgroundColor: "#5b9bd5",
+                    tension: 0.3,
+                    pointRadius: 2,
+                    yAxisID: "y",
+                  },
+                  {
+                    label: "給与",
+                    data: trendData.salary,
+                    borderColor: "#c8861a",
+                    backgroundColor: "#c8861a",
+                    tension: 0.3,
+                    pointRadius: 2,
+                    yAxisID: "y",
+                  },
+                  {
+                    label: "利益",
+                    data: trendData.profit,
+                    borderColor: "#a07de8",
+                    backgroundColor: "#a07de8",
+                    tension: 0.3,
+                    pointRadius: 2,
+                    yAxisID: "y",
+                  },
+                  {
+                    label: "動員数",
+                    data: trendData.mobil,
+                    borderColor: "#6fcf97",
+                    backgroundColor: "#6fcf97",
+                    tension: 0.3,
+                    pointRadius: 2,
+                    yAxisID: "y1",
+                  },
+                ],
+              }}
+              options={{
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: "index", intersect: false },
+                plugins: {
+                  legend: {
+                    labels: { color: "#a08860", boxWidth: 12, font: { size: 10 } },
+                  },
+                },
+                scales: {
+                  x: {
+                    ticks: { color: "#a08860", font: { size: 10 } },
+                    grid: { color: "rgba(255,180,60,0.06)" },
+                  },
+                  y: {
+                    position: "left",
+                    ticks: { color: "#a08860", font: { size: 10 } },
+                    grid: { color: "rgba(255,180,60,0.06)" },
+                  },
+                  y1: {
+                    position: "right",
+                    ticks: { color: "#6fcf97", font: { size: 10 } },
+                    grid: { drawOnChartArea: false },
+                  },
+                },
+              }}
+            />
+          </div>
         </div>
       </div>
       </div>
