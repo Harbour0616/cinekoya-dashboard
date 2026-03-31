@@ -579,7 +579,7 @@ export default function DailyReportPage() {
         </div>
         <div className="bg-card border border-card-border rounded-2xl p-5">
           <p className="text-xs text-sub mb-3">過去2週間のトレンド</p>
-          <div className="w-full" style={{ aspectRatio: "2 / 1" }}>
+          <div className="w-full max-h-[250px]">
             <Line
               data={{
                 labels: trendData.labels,
