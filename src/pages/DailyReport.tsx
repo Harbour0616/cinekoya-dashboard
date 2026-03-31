@@ -78,6 +78,8 @@ export default function DailyReportPage() {
   const [saving, setSaving] = useState(false);
   const [saveMsg, setSaveMsg] = useState<string | null>(null);
   const [titleError, setTitleError] = useState(false);
+  const [dateError, setDateError] = useState(false);
+  const [timeSlotError, setTimeSlotError] = useState(false);
 
   const [reports, setReports] = useState<DailyReport[]>([]);
   const [loading, setLoading] = useState(true);
@@ -138,6 +140,8 @@ export default function DailyReportPage() {
   const totalPages = Math.ceil(filteredReports.length / PAGE_SIZE);
 
   const ticketRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const dateRef = useRef<HTMLDivElement>(null);
+  const timeSlotRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
 
   // Attendance salary for the selected date
@@ -192,12 +196,17 @@ export default function DailyReportPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.title.trim()) {
-      setTitleError(true);
-      titleRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    const dErr = !form.date;
+    const tErr = !form.time_slot;
+    const mErr = !form.title.trim();
+    setDateError(dErr);
+    setTimeSlotError(tErr);
+    setTitleError(mErr);
+    const firstErr = dErr ? dateRef : tErr ? timeSlotRef : mErr ? titleRef : null;
+    if (firstErr) {
+      firstErr.current?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
-    setTitleError(false);
     setSaving(true);
     setSaveMsg(null);
 
@@ -301,22 +310,31 @@ export default function DailyReportPage() {
         </h3>
 
         {/* 日付 */}
-        <div>
+        <div ref={dateRef}>
           <label className="block text-xs text-sub mb-1">日付</label>
           <input
             type="date"
             value={form.date}
-            onChange={(e) => setForm({ ...form, date: e.target.value })}
+            onChange={(e) => {
+              setForm({ ...form, date: e.target.value });
+              if (e.target.value) setDateError(false);
+            }}
             className="w-full bg-white/[0.03] border border-card-border rounded-lg px-3 py-2 text-sm text-cream outline-none focus:border-accent/40 transition-colors [color-scheme:dark]"
           />
+          {dateError && (
+            <p className="text-xs text-red-400 mt-1">日付を入力してください</p>
+          )}
         </div>
 
         {/* 時間帯 */}
-        <div>
+        <div ref={timeSlotRef}>
           <label className="block text-xs text-sub mb-1">時間帯</label>
           <select
             value={form.time_slot}
-            onChange={(e) => setForm({ ...form, time_slot: e.target.value })}
+            onChange={(e) => {
+              setForm({ ...form, time_slot: e.target.value });
+              if (e.target.value) setTimeSlotError(false);
+            }}
             className="w-full bg-white/[0.03] border border-card-border rounded-lg px-3 py-2 text-sm text-cream outline-none focus:border-accent/40 transition-colors [color-scheme:dark]"
           >
             {TIME_SLOTS.map((s) => (
@@ -325,6 +343,9 @@ export default function DailyReportPage() {
               </option>
             ))}
           </select>
+          {timeSlotError && (
+            <p className="text-xs text-red-400 mt-1">時間帯を選択してください</p>
+          )}
         </div>
 
         {/* 上映作品 */}
