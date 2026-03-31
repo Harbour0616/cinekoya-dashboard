@@ -597,10 +597,12 @@ export default function DailyReportPage() {
         })()}
         <div className="bg-card border border-card-border rounded-2xl p-5">
           <p className="text-xs text-sub mb-3">今日の作品別動員数</p>
+          <div className="w-full relative" style={{ height: 200 }}>
           {dailyMobilByMovie.length === 0 ? (
-            <p className="text-sm text-sub text-center py-4">データなし</p>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <p className="text-sm text-sub">データなし</p>
+            </div>
           ) : (
-            <div className="w-full" style={{ height: 200 }}>
               <Bar
                 data={{
                   labels: dailyMobilByMovie.map((d) => d.title),
@@ -648,8 +650,8 @@ export default function DailyReportPage() {
                   },
                 }}
               />
-            </div>
           )}
+          </div>
         </div>
         <div className="bg-card border border-card-border rounded-2xl p-5">
           <p className="text-xs text-sub mb-3">過去2週間のトレンド</p>
