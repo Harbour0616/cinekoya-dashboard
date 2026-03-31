@@ -231,34 +231,34 @@ export default function DailyReportPage() {
           {editingId ? "日報を編集" : "日報を登録"}
         </h3>
 
-        {/* Date + Time slot */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-xs text-sub mb-1">日付</label>
-            <input
-              type="date"
-              value={form.date}
-              onChange={(e) => setForm({ ...form, date: e.target.value })}
-              className="w-full bg-white/[0.03] border border-card-border rounded-lg px-3 py-2 text-sm text-cream outline-none focus:border-accent/40 transition-colors [color-scheme:dark]"
-            />
-          </div>
-          <div>
-            <label className="block text-xs text-sub mb-1">時間帯</label>
-            <select
-              value={form.time_slot}
-              onChange={(e) => setForm({ ...form, time_slot: e.target.value })}
-              className="w-full bg-white/[0.03] border border-card-border rounded-lg px-3 py-2 text-sm text-cream outline-none focus:border-accent/40 transition-colors [color-scheme:dark]"
-            >
-              {TIME_SLOTS.map((s) => (
-                <option key={s.value} value={s.value} className="bg-bg text-cream">
-                  {s.label}
-                </option>
-              ))}
-            </select>
-          </div>
+        {/* 日付 */}
+        <div>
+          <label className="block text-xs text-sub mb-1">日付</label>
+          <input
+            type="date"
+            value={form.date}
+            onChange={(e) => setForm({ ...form, date: e.target.value })}
+            className="w-full bg-white/[0.03] border border-card-border rounded-lg px-3 py-2 text-sm text-cream outline-none focus:border-accent/40 transition-colors [color-scheme:dark]"
+          />
         </div>
 
-        {/* Movie title with search dropdown */}
+        {/* 時間帯 */}
+        <div>
+          <label className="block text-xs text-sub mb-1">時間帯</label>
+          <select
+            value={form.time_slot}
+            onChange={(e) => setForm({ ...form, time_slot: e.target.value })}
+            className="w-full bg-white/[0.03] border border-card-border rounded-lg px-3 py-2 text-sm text-cream outline-none focus:border-accent/40 transition-colors [color-scheme:dark]"
+          >
+            {TIME_SLOTS.map((s) => (
+              <option key={s.value} value={s.value} className="bg-bg text-cream">
+                {s.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* 上映作品 */}
         <div className="relative">
           <label className="block text-xs text-sub mb-1">
             上映作品 <span className="text-red-400">*</span>
@@ -302,13 +302,13 @@ export default function DailyReportPage() {
           )}
         </div>
 
-        {/* Ticket types */}
+        {/* 券種別（縦一列） */}
         <div>
           <label className="block text-xs text-sub mb-2">
             動員数（券種別）
             <span className="ml-2 text-accent font-bold">合計: {ticketTotal}人</span>
           </label>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="space-y-3">
             {TICKET_TYPES.map((t) => (
               <div key={t.key}>
                 <label className="block text-xs text-sub mb-1 flex items-center gap-1.5">
@@ -333,37 +333,7 @@ export default function DailyReportPage() {
           </div>
         </div>
 
-        {/* Revenue + Salary */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-xs text-sub mb-1">売上（税込）</label>
-            <input
-              type="number"
-              min={0}
-              value={form.revenue_taxin || ""}
-              onChange={(e) =>
-                setForm({ ...form, revenue_taxin: parseInt(e.target.value) || 0 })
-              }
-              className="w-full bg-white/[0.03] border border-card-border rounded-lg px-3 py-2 text-sm text-cream outline-none focus:border-accent/40 transition-colors"
-              placeholder="0"
-            />
-          </div>
-          <div>
-            <label className="block text-xs text-sub mb-1">給与</label>
-            <input
-              type="number"
-              min={0}
-              value={form.salary || ""}
-              onChange={(e) =>
-                setForm({ ...form, salary: parseInt(e.target.value) || 0 })
-              }
-              className="w-full bg-white/[0.03] border border-card-border rounded-lg px-3 py-2 text-sm text-cream outline-none focus:border-accent/40 transition-colors"
-              placeholder="0"
-            />
-          </div>
-        </div>
-
-        {/* Notes */}
+        {/* 備考・メモ */}
         <div>
           <label className="block text-xs text-sub mb-1">備考・メモ</label>
           <textarea
@@ -372,6 +342,36 @@ export default function DailyReportPage() {
             rows={2}
             className="w-full bg-white/[0.03] border border-card-border rounded-lg px-3 py-2 text-sm text-cream placeholder:text-sub/60 outline-none focus:border-accent/40 transition-colors resize-none"
             placeholder="備考を入力"
+          />
+        </div>
+
+        {/* 売上（税込） */}
+        <div>
+          <label className="block text-xs text-sub mb-1">売上（税込）</label>
+          <input
+            type="number"
+            min={0}
+            value={form.revenue_taxin || ""}
+            onChange={(e) =>
+              setForm({ ...form, revenue_taxin: parseInt(e.target.value) || 0 })
+            }
+            className="w-full bg-white/[0.03] border border-card-border rounded-lg px-3 py-2 text-sm text-cream outline-none focus:border-accent/40 transition-colors"
+            placeholder="0"
+          />
+        </div>
+
+        {/* 給与 */}
+        <div>
+          <label className="block text-xs text-sub mb-1">給与</label>
+          <input
+            type="number"
+            min={0}
+            value={form.salary || ""}
+            onChange={(e) =>
+              setForm({ ...form, salary: parseInt(e.target.value) || 0 })
+            }
+            className="w-full bg-white/[0.03] border border-card-border rounded-lg px-3 py-2 text-sm text-cream outline-none focus:border-accent/40 transition-colors"
+            placeholder="0"
           />
         </div>
 
