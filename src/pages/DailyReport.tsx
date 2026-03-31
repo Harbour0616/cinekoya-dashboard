@@ -337,6 +337,7 @@ export default function DailyReportPage() {
                     setForm({ ...form, title: t });
                     setMovieSearch(t);
                     setShowMovieDropdown(false);
+                    setTitleError(false);
                   }}
                   className="w-full text-left px-3 py-2 text-sm text-cream hover:bg-accent/10 transition-colors"
                 >
