@@ -476,6 +476,12 @@ export default function DailyReportPage() {
           </p>
         </div>
         <div className="bg-card border border-card-border rounded-2xl p-5">
+          <p className="text-xs text-sub mb-2">上映権料</p>
+          <p className="text-2xl font-bold text-cream">
+            ¥{Math.floor(dailyRevenueTaxout * 0.5).toLocaleString()}
+          </p>
+        </div>
+        <div className="bg-card border border-card-border rounded-2xl p-5">
           <p className="text-xs text-sub mb-2">{form.date} の給与合計</p>
           <p className="text-2xl font-bold text-cream">
             ¥{attendanceSalary.toLocaleString()}
@@ -487,12 +493,17 @@ export default function DailyReportPage() {
             ¥70,000
           </p>
         </div>
-        <div className="bg-card border border-card-border rounded-2xl p-5">
-          <p className="text-xs text-sub mb-2">{form.date} の利益</p>
-          <p className={`text-2xl font-bold ${dailyRevenueTaxout - attendanceSalary - 70000 >= 0 ? "text-green-400" : "text-red-400"}`}>
-            ¥{(dailyRevenueTaxout - attendanceSalary - 70000).toLocaleString()}
-          </p>
-        </div>
+        {(() => {
+          const profit = dailyRevenueTaxout - Math.floor(dailyRevenueTaxout * 0.5) - attendanceSalary - 70000;
+          return (
+            <div className="bg-card border border-card-border rounded-2xl p-5">
+              <p className="text-xs text-sub mb-2">{form.date} の利益</p>
+              <p className={`text-2xl font-bold ${profit >= 0 ? "text-green-400" : "text-red-400"}`}>
+                ¥{profit.toLocaleString()}
+              </p>
+            </div>
+          );
+        })()}
       </div>
       </div>
 
