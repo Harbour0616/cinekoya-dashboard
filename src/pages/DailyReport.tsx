@@ -728,7 +728,19 @@ export default function DailyReportPage() {
                       売上（税込）
                     </th>
                     <th className="text-right py-2 px-3 text-sub font-medium">
+                      売上（税抜）
+                    </th>
+                    <th className="text-right py-2 px-3 text-sub font-medium">
+                      上映権料
+                    </th>
+                    <th className="text-right py-2 px-3 text-sub font-medium">
                       給与
+                    </th>
+                    <th className="text-right py-2 px-3 text-sub font-medium">
+                      固定費
+                    </th>
+                    <th className="text-right py-2 px-3 text-sub font-medium">
+                      利益
                     </th>
                     <th className="text-right py-2 px-3 text-sub font-medium w-20">
                       操作
@@ -754,9 +766,31 @@ export default function DailyReportPage() {
                       <td className="py-2 px-3 text-right text-cream">
                         ¥{(r.revenue_taxin ?? 0).toLocaleString()}
                       </td>
-                      <td className="py-2 px-3 text-right text-sub">
-                        ¥{(r.salary ?? 0).toLocaleString()}
-                      </td>
+                      {(() => {
+                        const taxout = Math.floor((r.revenue_taxin ?? 0) / 1.1);
+                        const rights = Math.floor(taxout * 0.5);
+                        const sal = r.salary ?? 0;
+                        const prof = taxout - rights - sal - 70000;
+                        return (
+                          <>
+                            <td className="py-2 px-3 text-right text-cream">
+                              ¥{taxout.toLocaleString()}
+                            </td>
+                            <td className="py-2 px-3 text-right text-cream">
+                              ¥{rights.toLocaleString()}
+                            </td>
+                            <td className="py-2 px-3 text-right text-sub">
+                              ¥{sal.toLocaleString()}
+                            </td>
+                            <td className="py-2 px-3 text-right text-sub">
+                              ¥70,000
+                            </td>
+                            <td className={`py-2 px-3 text-right font-medium ${prof >= 0 ? "text-green-400" : "text-red-400"}`}>
+                              ¥{prof.toLocaleString()}
+                            </td>
+                          </>
+                        );
+                      })()}
                       <td className="py-2 px-3 text-right">
                         <div className="flex justify-end gap-1">
                           <button
