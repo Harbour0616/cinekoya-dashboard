@@ -3,6 +3,7 @@ import {
   LayoutDashboard,
   Users,
   Film,
+  Clapperboard,
   Upload,
 } from "lucide-react";
 
@@ -10,6 +11,7 @@ const menuItems = [
   { to: "/", label: "ダッシュボード", icon: LayoutDashboard },
   { to: "/audience", label: "来客数分析", icon: Users },
   { to: "/movies", label: "作品分析", icon: Film },
+  { to: "/movies-master", label: "作品管理", icon: Clapperboard },
   { to: "/import", label: "データインポート", icon: Upload },
 ];
 
