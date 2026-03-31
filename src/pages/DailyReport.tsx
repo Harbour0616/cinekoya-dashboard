@@ -108,6 +108,7 @@ export default function DailyReportPage() {
     const { data, error } = await supabase
       .from("daily_reports")
       .select("*")
+      .order("date", { ascending: false })
       .order("created_at", { ascending: false });
     if (!error && data) setReports(data);
     setLoading(false);
