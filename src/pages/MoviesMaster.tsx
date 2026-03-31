@@ -347,9 +347,7 @@ export default function MoviesMaster() {
                           <span className="inline-block px-2 py-0.5 rounded bg-accent/10 text-accent text-xs">
                             {m.group_name}
                           </span>
-                        ) : (
-                          <span className="text-sub text-xs">—</span>
-                        )}
+                        ) : null}
                       </td>
                       <td className="py-2.5 px-3 text-right text-cream text-xs">
                         {stats ? `${stats.count}回` : "—"}
