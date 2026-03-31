@@ -128,6 +128,7 @@ export default function DailyReportPage() {
   const totalPages = Math.ceil(filteredReports.length / PAGE_SIZE);
 
   const ticketRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const titleRef = useRef<HTMLDivElement>(null);
 
   // Attendance salary for the selected date
   const [attendanceSalary, setAttendanceSalary] = useState(0);
@@ -170,6 +171,7 @@ export default function DailyReportPage() {
     e.preventDefault();
     if (!form.title.trim()) {
       setTitleError(true);
+      titleRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
     setTitleError(false);
@@ -303,7 +305,7 @@ export default function DailyReportPage() {
         </div>
 
         {/* 上映作品 */}
-        <div className="relative">
+        <div ref={titleRef} className="relative">
           <label className="block text-xs text-sub mb-1">
             上映作品 <span className="text-red-400">*</span>
           </label>
