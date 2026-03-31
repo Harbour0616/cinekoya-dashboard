@@ -7,7 +7,9 @@ import {
   ClipboardList,
   CalendarCheck,
   Upload,
+  LogOut,
 } from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
 
 const menuItems = [
   { to: "/", label: "ダッシュボード", icon: LayoutDashboard },
@@ -21,6 +23,7 @@ const menuItems = [
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const { pathname } = useLocation();
+  const { signOut } = useAuth();
 
   return (
     <div className="min-h-screen bg-bg flex">
@@ -57,8 +60,15 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </nav>
 
         {/* Footer */}
-        <div className="px-5 py-4 border-t border-card-border text-xs text-sub">
-          経営ダッシュボード
+        <div className="px-3 py-4 border-t border-card-border space-y-3">
+          <div className="px-2 text-xs text-sub">経営ダッシュボード</div>
+          <button
+            onClick={signOut}
+            className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm text-sub hover:text-cream hover:bg-white/[0.03] transition-colors"
+          >
+            <LogOut size={16} strokeWidth={1.8} />
+            ログアウト
+          </button>
         </div>
       </aside>
 
