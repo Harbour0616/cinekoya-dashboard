@@ -1,5 +1,5 @@
-import { useEffect, useState, useMemo, useRef } from "react";
-import { Pencil, Trash2, Search } from "lucide-react";
+import { Fragment, useEffect, useState, useMemo, useRef } from "react";
+import { Pencil, Trash2, Search, ChevronDown, ChevronRight } from "lucide-react";
 import { Bar, Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -133,11 +133,40 @@ export default function DailyReportPage() {
     return reports.filter((r) => r.date?.startsWith(monthFilter));
   }, [reports, monthFilter]);
 
-  const pagedReports = filteredReports.slice(
+  // Group reports by date
+  const groupedReports = useMemo(() => {
+    const map = new Map<string, DailyReport[]>();
+    for (const r of filteredReports) {
+      const d = r.date ?? "";
+      if (!map.has(d)) map.set(d, []);
+      map.get(d)!.push(r);
+    }
+    return Array.from(map.entries()).sort((a, b) => b[0].localeCompare(a[0]));
+  }, [filteredReports]);
+
+  const [expandedDates, setExpandedDates] = useState<Set<string>>(new Set());
+
+  // Auto-expand latest date when data changes
+  useEffect(() => {
+    if (groupedReports.length > 0) {
+      setExpandedDates(new Set([groupedReports[0][0]]));
+    }
+  }, [groupedReports]);
+
+  const toggleDate = (date: string) => {
+    setExpandedDates((prev) => {
+      const next = new Set(prev);
+      if (next.has(date)) next.delete(date);
+      else next.add(date);
+      return next;
+    });
+  };
+
+  const totalPages = Math.ceil(groupedReports.length / PAGE_SIZE);
+  const pagedGroups = groupedReports.slice(
     page * PAGE_SIZE,
     (page + 1) * PAGE_SIZE
   );
-  const totalPages = Math.ceil(filteredReports.length / PAGE_SIZE);
 
   const ticketRefs = useRef<(HTMLInputElement | null)[]>([]);
   const titleRef = useRef<HTMLDivElement>(null);
@@ -705,7 +734,7 @@ export default function DailyReportPage() {
 
         {loading ? (
           <div className="text-center py-8 text-sub">読み込み中...</div>
-        ) : pagedReports.length === 0 ? (
+        ) : pagedGroups.length === 0 ? (
           <div className="text-center py-8 text-sub">日報がありません</div>
         ) : (
           <>
@@ -713,105 +742,80 @@ export default function DailyReportPage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-card-border">
-                    <th className="text-left py-2 px-3 text-sub font-medium">
-                      日付
-                    </th>
-                    <th className="text-left py-2 px-3 text-sub font-medium">
-                      作品名
-                    </th>
-                    <th className="text-left py-2 px-3 text-sub font-medium">
-                      時間帯
-                    </th>
-                    <th className="text-right py-2 px-3 text-sub font-medium">
-                      動員数
-                    </th>
-                    <th className="text-right py-2 px-3 text-sub font-medium">
-                      売上（税込）
-                    </th>
-                    <th className="text-right py-2 px-3 text-sub font-medium">
-                      売上（税抜）
-                    </th>
-                    <th className="text-right py-2 px-3 text-sub font-medium">
-                      上映権料
-                    </th>
-                    <th className="text-right py-2 px-3 text-sub font-medium">
-                      給与
-                    </th>
-                    <th className="text-right py-2 px-3 text-sub font-medium">
-                      固定費
-                    </th>
-                    <th className="text-right py-2 px-3 text-sub font-medium">
-                      利益
-                    </th>
-                    <th className="text-right py-2 px-3 text-sub font-medium w-20">
-                      操作
-                    </th>
+                    <th className="text-left py-2 px-3 text-sub font-medium">日付</th>
+                    <th className="text-right py-2 px-3 text-sub font-medium">動員数</th>
+                    <th className="text-right py-2 px-3 text-sub font-medium">売上（税抜）</th>
+                    <th className="text-right py-2 px-3 text-sub font-medium">上映権料</th>
+                    <th className="text-right py-2 px-3 text-sub font-medium">給与</th>
+                    <th className="text-right py-2 px-3 text-sub font-medium">固定費</th>
+                    <th className="text-right py-2 px-3 text-sub font-medium">利益</th>
+                    <th className="w-10"></th>
                   </tr>
                 </thead>
                 <tbody>
-                  {pagedReports.map((r) => (
-                    <tr
-                      key={r.id}
-                      className="border-b border-card-border/50 hover:bg-white/[0.02] transition-colors"
-                    >
-                      <td className="py-2 px-3 text-cream whitespace-nowrap">
-                        {r.date ?? "—"}
-                      </td>
-                      <td className="py-2 px-3 text-cream font-medium max-w-[30vw] truncate">
-                        {r.title ?? "—"}
-                      </td>
-                      <td className="py-2 px-3 text-cream">{r.time_slot ?? "—"}</td>
-                      <td className="py-2 px-3 text-right text-cream">
-                        {r.mobilization?.toLocaleString() ?? 0}人
-                      </td>
-                      <td className="py-2 px-3 text-right text-cream">
-                        ¥{(r.revenue_taxin ?? 0).toLocaleString()}
-                      </td>
-                      {(() => {
-                        const taxout = Math.floor((r.revenue_taxin ?? 0) / 1.1);
-                        const rights = Math.floor(taxout * 0.5);
-                        const sal = r.salary ?? 0;
-                        const prof = taxout - rights - sal - 70000;
-                        return (
-                          <>
-                            <td className="py-2 px-3 text-right text-cream">
-                              ¥{taxout.toLocaleString()}
-                            </td>
-                            <td className="py-2 px-3 text-right text-cream">
-                              ¥{rights.toLocaleString()}
-                            </td>
-                            <td className="py-2 px-3 text-right text-sub">
-                              ¥{sal.toLocaleString()}
-                            </td>
-                            <td className="py-2 px-3 text-right text-sub">
-                              ¥70,000
-                            </td>
-                            <td className={`py-2 px-3 text-right font-medium ${prof >= 0 ? "text-green-400" : "text-red-400"}`}>
-                              ¥{prof.toLocaleString()}
-                            </td>
-                          </>
-                        );
-                      })()}
-                      <td className="py-2 px-3 text-right">
-                        <div className="flex justify-end gap-1">
-                          <button
-                            onClick={() => handleEdit(r)}
-                            className="p-1.5 rounded-lg text-sub hover:text-accent hover:bg-accent/10 transition-colors"
-                            title="編集"
-                          >
-                            <Pencil size={14} />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(r.id)}
-                            className="p-1.5 rounded-lg text-sub hover:text-red-400 hover:bg-red-400/10 transition-colors"
-                            title="削除"
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                  {pagedGroups.map(([date, rows]) => {
+                    const expanded = expandedDates.has(date);
+                    const totalMobil = rows.reduce((s, r) => s + (r.mobilization ?? 0), 0);
+                    const totalTaxout = rows.reduce((s, r) => s + Math.floor((r.revenue_taxin ?? 0) / 1.1), 0);
+                    const totalRights = Math.floor(totalTaxout * 0.5);
+                    const totalSal = rows.reduce((s, r) => s + (r.salary ?? 0), 0);
+                    const totalProfit = totalTaxout - totalRights - totalSal - 70000;
+                    return (
+                      <Fragment key={date}>
+                        <tr
+                          className="border-b border-card-border hover:bg-white/[0.02] transition-colors cursor-pointer"
+                          onClick={() => toggleDate(date)}
+                        >
+                          <td className="py-2.5 px-3 text-cream font-bold whitespace-nowrap">{date}</td>
+                          <td className="py-2.5 px-3 text-right text-cream">{totalMobil.toLocaleString()}人</td>
+                          <td className="py-2.5 px-3 text-right text-cream">¥{totalTaxout.toLocaleString()}</td>
+                          <td className="py-2.5 px-3 text-right text-cream">¥{totalRights.toLocaleString()}</td>
+                          <td className="py-2.5 px-3 text-right text-sub">¥{totalSal.toLocaleString()}</td>
+                          <td className="py-2.5 px-3 text-right text-sub">¥70,000</td>
+                          <td className={`py-2.5 px-3 text-right font-medium ${totalProfit >= 0 ? "text-green-400" : "text-red-400"}`}>
+                            ¥{totalProfit.toLocaleString()}
+                          </td>
+                          <td className="py-2.5 px-1 text-sub">
+                            {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                          </td>
+                        </tr>
+                        {expanded &&
+                          rows.map((r) => {
+                            const taxout = Math.floor((r.revenue_taxin ?? 0) / 1.1);
+                            return (
+                              <tr
+                                key={r.id}
+                                className="border-b border-card-border/30 bg-white/[0.01]"
+                              >
+                                <td className="py-1.5 pl-8 pr-3 text-sub">{r.title ?? "—"}</td>
+                                <td className="py-1.5 px-3 text-right text-sub">{(r.mobilization ?? 0).toLocaleString()}人</td>
+                                <td className="py-1.5 px-3 text-right text-sub">¥{taxout.toLocaleString()}</td>
+                                <td className="py-1.5 px-3 text-right text-sub text-xs">{r.time_slot ?? ""}</td>
+                                <td className="py-1.5 px-3" colSpan={2}></td>
+                                <td className="py-1.5 px-3" colSpan={2}>
+                                  <div className="flex justify-end gap-1">
+                                    <button
+                                      onClick={(e) => { e.stopPropagation(); handleEdit(r); }}
+                                      className="p-1 rounded-lg text-sub hover:text-accent hover:bg-accent/10 transition-colors"
+                                      title="編集"
+                                    >
+                                      <Pencil size={12} />
+                                    </button>
+                                    <button
+                                      onClick={(e) => { e.stopPropagation(); handleDelete(r.id); }}
+                                      className="p-1 rounded-lg text-sub hover:text-red-400 hover:bg-red-400/10 transition-colors"
+                                      title="削除"
+                                    >
+                                      <Trash2 size={12} />
+                                    </button>
+                                  </div>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                      </Fragment>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
