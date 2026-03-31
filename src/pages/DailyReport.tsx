@@ -795,12 +795,16 @@ export default function DailyReportPage() {
                                 key={r.id}
                                 className="border-b border-card-border/30 bg-white/[0.01]"
                               >
-                                <td className="py-1.5 pl-8 pr-3 text-sub">{r.title ?? "—"}</td>
-                                <td className="py-1.5 px-3 text-center text-sub text-xs">{TIME_SLOT_SHORT[r.time_slot ?? ""] ?? r.time_slot ?? ""}</td>
+                                <td className="py-1.5 pl-8 pr-3 text-sub">
+                                  {r.title ?? "—"}
+                                  {r.time_slot && <span className="ml-2 text-xs text-sub/60">{TIME_SLOT_SHORT[r.time_slot] ?? r.time_slot}</span>}
+                                </td>
                                 <td className="py-1.5 px-3 text-right text-sub">{(r.mobilization ?? 0).toLocaleString()}人</td>
-                                <td className="py-1.5 px-3 text-right text-sub">¥{(r.revenue_taxin ?? 0).toLocaleString()}</td>
                                 <td className="py-1.5 px-3 text-right text-sub">¥{taxout.toLocaleString()}</td>
-                                <td className="py-1.5 px-3" colSpan={2}></td>
+                                <td className="py-1.5 px-3 text-center text-sub/40">-</td>
+                                <td className="py-1.5 px-3 text-center text-sub/40">-</td>
+                                <td className="py-1.5 px-3 text-center text-sub/40">-</td>
+                                <td className="py-1.5 px-3 text-center text-sub/40">-</td>
                                 <td className="py-1.5 px-3">
                                   <div className="flex justify-end gap-1">
                                     <button
