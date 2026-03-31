@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { Pencil, Trash2, Search } from "lucide-react";
 import { supabase } from "../lib/supabase";
 import { TICKET_TYPES } from "../types";
@@ -126,6 +126,8 @@ export default function DailyReportPage() {
     (page + 1) * PAGE_SIZE
   );
   const totalPages = Math.ceil(filteredReports.length / PAGE_SIZE);
+
+  const ticketRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   // Ticket total
   const ticketTotal = Object.values(form.tickets).reduce((s, v) => s + v, 0);
@@ -309,7 +311,7 @@ export default function DailyReportPage() {
             <span className="ml-2 text-accent font-bold">合計: {ticketTotal}人</span>
           </label>
           <div className="space-y-3">
-            {TICKET_TYPES.map((t) => (
+            {TICKET_TYPES.map((t, i) => (
               <div key={t.key}>
                 <label className="block text-xs text-sub mb-1 flex items-center gap-1.5">
                   <span
@@ -319,12 +321,19 @@ export default function DailyReportPage() {
                   {t.label}
                 </label>
                 <input
+                  ref={(el) => { ticketRefs.current[i] = el; }}
                   type="number"
                   min={0}
                   value={form.tickets[t.key] || ""}
                   onChange={(e) =>
                     setTicket(t.key, parseInt(e.target.value) || 0)
                   }
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      ticketRefs.current[i + 1]?.focus();
+                    }
+                  }}
                   className="w-full bg-white/[0.03] border border-card-border rounded-lg px-3 py-1.5 text-sm text-cream outline-none focus:border-accent/40 transition-colors no-spinner"
                   placeholder="0"
                 />
