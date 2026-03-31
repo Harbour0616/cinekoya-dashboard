@@ -21,6 +21,35 @@ function randomInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+function distributeAudience(total: number) {
+  const general = randomInt(Math.floor(total * 0.3), Math.floor(total * 0.5));
+  let rest = total - general;
+  const fc = randomInt(0, Math.min(rest, Math.floor(total * 0.15)));
+  rest -= fc;
+  const fcGuest = randomInt(0, Math.min(rest, Math.floor(total * 0.05)));
+  rest -= fcGuest;
+  const members = randomInt(0, Math.min(rest, Math.floor(total * 0.15)));
+  rest -= members;
+  const membersGuest = randomInt(0, Math.min(rest, Math.floor(total * 0.05)));
+  rest -= membersGuest;
+  const u28 = randomInt(0, Math.min(rest, Math.floor(total * 0.1)));
+  rest -= u28;
+  const u22 = randomInt(0, Math.min(rest, Math.floor(total * 0.08)));
+  rest -= u22;
+  const highschool = rest;
+
+  return {
+    audience_general: general,
+    audience_fc: fc,
+    audience_fc_guest: fcGuest,
+    audience_members: members,
+    audience_members_guest: membersGuest,
+    audience_u28: u28,
+    audience_u22: u22,
+    audience_highschool: highschool,
+  };
+}
+
 function generateSampleData(): DailyReport[] {
   const data: DailyReport[] = [];
   let id = 1;
@@ -41,6 +70,7 @@ function generateSampleData(): DailyReport[] {
       const revenueTaxout = Math.round(revenueTaxin / 1.1);
       const salary = randomInt(8000, 25000);
       const profit = revenueTaxout - salary - randomInt(5000, 15000);
+      const tickets = distributeAudience(audience);
 
       data.push({
         id: id++,
@@ -53,6 +83,7 @@ function generateSampleData(): DailyReport[] {
         mobilization: audience,
         salary,
         profit,
+        ...tickets,
         created_at: new Date().toISOString(),
       });
     }

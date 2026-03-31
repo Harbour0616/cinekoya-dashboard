@@ -20,6 +20,12 @@ export default function Import() {
         日報データをSupabaseのdaily_reportsテーブルにインポートします。
       </p>
 
+      {/* Re-import banner */}
+      <div className="bg-accent/10 border border-accent/30 rounded-xl px-4 py-3 text-sm text-accent">
+        🎟️ 券種別データ（一般・FC・メンバーズ・U28・U22・高校生以下）に対応しました。
+        作品分析ページで券種構成を確認するには、券種データを含めて再インポートしてください。
+      </div>
+
       {/* Mode tabs */}
       <div className="flex gap-2">
         <button

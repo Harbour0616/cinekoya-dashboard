@@ -20,6 +20,14 @@ interface ParsedRow {
   mobilization: number | null;
   salary: number | null;
   profit: number | null;
+  audience_general: number | null;
+  audience_fc: number | null;
+  audience_fc_guest: number | null;
+  audience_members: number | null;
+  audience_members_guest: number | null;
+  audience_u28: number | null;
+  audience_u22: number | null;
+  audience_highschool: number | null;
 }
 
 function excelDateToISO(value: unknown): string | null {
@@ -81,6 +89,16 @@ function parseSheet(sheet: XLSX.WorkSheet): ParsedRow[] {
     const salary = toInt(r[64]);
     const profit = toInt(r[65]);
 
+    // Ticket type columns (col8-col15)
+    const audience_general = toInt(r[8]);
+    const audience_fc = toInt(r[9]);
+    const audience_fc_guest = toInt(r[10]);
+    const audience_members = toInt(r[11]);
+    const audience_members_guest = toInt(r[12]);
+    const audience_u28 = toInt(r[13]);
+    const audience_u22 = toInt(r[14]);
+    const audience_highschool = toInt(r[15]);
+
     rows.push({
       title,
       date: dateVal,
@@ -91,6 +109,14 @@ function parseSheet(sheet: XLSX.WorkSheet): ParsedRow[] {
       mobilization: audience,
       salary,
       profit,
+      audience_general,
+      audience_fc,
+      audience_fc_guest,
+      audience_members,
+      audience_members_guest,
+      audience_u28,
+      audience_u22,
+      audience_highschool,
     });
   }
 
@@ -179,7 +205,7 @@ export default function ExcelImport({ onComplete }: { onComplete: () => void }) 
             プレビュー（先頭5行 / 全{parsed.length}行）
           </h3>
           <p className="text-sub text-xs mb-3">
-            col0:タイトル / col2:日付 / col7:時間帯 / col29:動員 / col31:売上(税込) / col32:売上(税抜) / col64:給与 / col65:利益
+            col0:タイトル / col2:日付 / col7:時間帯 / col8-15:券種別 / col29:動員 / col31:売上(税込) / col32:売上(税抜) / col64:給与 / col65:利益
           </p>
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
@@ -276,6 +302,38 @@ export default function ExcelImport({ onComplete }: { onComplete: () => void }) 
           <div className="flex justify-between">
             <span className="text-sub">col7</span>
             <span className="text-cream">時間帯（A〜E）</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-sub">col8</span>
+            <span className="text-cream">一般</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-sub">col9</span>
+            <span className="text-cream">ファンクラブ</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-sub">col10</span>
+            <span className="text-cream">ファンクラブ同伴</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-sub">col11</span>
+            <span className="text-cream">メンバーズ</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-sub">col12</span>
+            <span className="text-cream">メンバーズ同伴</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-sub">col13</span>
+            <span className="text-cream">U28</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-sub">col14</span>
+            <span className="text-cream">U22</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-sub">col15</span>
+            <span className="text-cream">高校生以下</span>
           </div>
           <div className="flex justify-between">
             <span className="text-sub">col29</span>
