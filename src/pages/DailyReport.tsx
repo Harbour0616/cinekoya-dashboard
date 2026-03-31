@@ -334,10 +334,6 @@ export default function DailyReportPage() {
         onSubmit={handleSubmit}
         className="bg-card border border-card-border rounded-2xl p-5 space-y-4 w-1/3 shrink-0"
       >
-        <h3 className="text-sm font-bold text-cream">
-          {editingId ? "日報を編集" : "日報を登録"}
-        </h3>
-
         {/* 日付 */}
         <div>
           <label className="block text-xs text-sub mb-1">日付</label>
