@@ -751,6 +751,7 @@ export default function DailyReportPage() {
                 <thead>
                   <tr className="border-b border-card-border">
                     <th className="text-left py-2 px-3 text-sub font-medium">日付</th>
+                    <th className="w-10"></th>
                     <th className="text-right py-2 px-3 text-sub font-medium">動員数</th>
                     <th className="text-right py-2 px-3 text-sub font-medium">売上（税抜）</th>
                     <th className="text-right py-2 px-3 text-sub font-medium">上映権料</th>
@@ -775,6 +776,7 @@ export default function DailyReportPage() {
                           onClick={() => toggleDate(date)}
                         >
                           <td className="py-2.5 px-3 text-cream font-bold whitespace-nowrap">{date}</td>
+                          <td></td>
                           <td className="py-2.5 px-3 text-right text-cream">{totalMobil.toLocaleString()}人</td>
                           <td className="py-2.5 px-3 text-right text-cream">¥{totalTaxout.toLocaleString()}</td>
                           <td className="py-2.5 px-3 text-right text-cream">¥{totalRights.toLocaleString()}</td>
@@ -795,10 +797,8 @@ export default function DailyReportPage() {
                                 key={r.id}
                                 className="border-b border-card-border/30 bg-white/[0.01]"
                               >
-                                <td className="py-1.5 pl-8 pr-3 text-sub">
-                                  {r.title ?? "—"}
-                                  {r.time_slot && <span className="ml-2 text-xs text-sub/60">{TIME_SLOT_SHORT[r.time_slot] ?? r.time_slot}</span>}
-                                </td>
+                                <td className="py-1.5 pl-8 pr-3 text-sub">{r.title ?? "—"}</td>
+                                <td className="py-1.5 px-1 text-center text-sub text-xs">{TIME_SLOT_SHORT[r.time_slot ?? ""] ?? r.time_slot ?? ""}</td>
                                 <td className="py-1.5 px-3 text-right text-sub">{(r.mobilization ?? 0).toLocaleString()}人</td>
                                 <td className="py-1.5 px-3 text-right text-sub">¥{taxout.toLocaleString()}</td>
                                 <td className="py-1.5 px-3 text-center text-sub/40">-</td>
