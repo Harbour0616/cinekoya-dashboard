@@ -21,14 +21,14 @@ export interface DailyReport {
 }
 
 export const TICKET_TYPES = [
-  { key: "audience_general", label: "一般", color: "#c8861a" },
-  { key: "audience_fc", label: "ファンクラブ", color: "#5b9bd5" },
-  { key: "audience_fc_guest", label: "ファンクラブ同伴", color: "#85b7eb" },
-  { key: "audience_members", label: "メンバーズ", color: "#6fcf97" },
-  { key: "audience_members_guest", label: "メンバーズ同伴", color: "#a8e6c1" },
-  { key: "audience_u28", label: "U28", color: "#eb5757" },
-  { key: "audience_u22", label: "U22", color: "#f0a0a0" },
-  { key: "audience_highschool", label: "高校生以下", color: "#a08860" },
+  { key: "audience_general", label: "一般（@1,800）", price: 1800, color: "#c8861a" },
+  { key: "audience_fc", label: "ファンクラブ（@1,100）", price: 1100, color: "#5b9bd5" },
+  { key: "audience_fc_guest", label: "ファンクラブ同伴（@1,400）", price: 1400, color: "#85b7eb" },
+  { key: "audience_members", label: "メンバーズ（@1,400）", price: 1400, color: "#6fcf97" },
+  { key: "audience_members_guest", label: "メンバーズ同伴（@1,400）", price: 1400, color: "#a8e6c1" },
+  { key: "audience_u28", label: "U28（@1,500）", price: 1500, color: "#eb5757" },
+  { key: "audience_u22", label: "U22（@1,300）", price: 1300, color: "#f0a0a0" },
+  { key: "audience_highschool", label: "高校生以下（@1,000）", price: 1000, color: "#a08860" },
 ] as const;
 
 export type TicketTypeKey = (typeof TICKET_TYPES)[number]["key"];

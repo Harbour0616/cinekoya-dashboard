@@ -141,6 +141,12 @@ export default function DailyReportPage() {
   // Ticket total
   const ticketTotal = Object.values(form.tickets).reduce((s, v) => s + v, 0);
 
+  // Auto-calculated revenue
+  const calculatedRevenue = TICKET_TYPES.reduce(
+    (s, t) => s + form.tickets[t.key] * t.price,
+    0
+  );
+
   const setTicket = (key: TicketTypeKey, value: number) => {
     setForm((prev) => ({
       ...prev,
@@ -154,7 +160,7 @@ export default function DailyReportPage() {
     setSaving(true);
     setSaveMsg(null);
 
-    const revenueTaxout = Math.round(form.revenue_taxin / 1.1);
+    const revenueTaxout = Math.round(calculatedRevenue / 1.1);
     const profit = revenueTaxout - form.salary;
 
     const payload = {
@@ -163,7 +169,7 @@ export default function DailyReportPage() {
       time_slot: form.time_slot,
       audience_total: ticketTotal,
       mobilization: ticketTotal,
-      revenue_taxin: form.revenue_taxin,
+      revenue_taxin: calculatedRevenue,
       revenue_taxout: revenueTaxout,
       salary: form.salary,
       profit,
@@ -364,18 +370,14 @@ export default function DailyReportPage() {
           />
         </div>
 
-        {/* 売上（税込） */}
+        {/* 売上（税込・自動計算） */}
         <div>
-          <label className="block text-xs text-sub mb-1">売上（税込）</label>
+          <label className="block text-xs text-sub mb-1">売上（税込・自動計算）</label>
           <input
-            type="number"
-            min={0}
-            value={form.revenue_taxin || ""}
-            onChange={(e) =>
-              setForm({ ...form, revenue_taxin: parseInt(e.target.value) || 0 })
-            }
-            className="w-full bg-white/[0.03] border border-card-border rounded-lg px-3 py-2 text-sm text-cream outline-none focus:border-accent/40 transition-colors"
-            placeholder="0"
+            type="text"
+            readOnly
+            value={`¥${calculatedRevenue.toLocaleString()}`}
+            className="w-full bg-white/[0.06] border border-card-border rounded-lg px-3 py-2 text-sm text-cream outline-none cursor-default"
           />
         </div>
 
