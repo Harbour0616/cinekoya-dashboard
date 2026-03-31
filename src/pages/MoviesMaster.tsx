@@ -299,8 +299,10 @@ export default function MoviesMaster() {
                   <th className="text-left py-2 px-3 text-sub font-medium">グループ</th>
                   <th className="text-right py-2 px-3 text-sub font-medium">上映回数</th>
                   <th className="text-right py-2 px-3 text-sub font-medium">来客数</th>
+                  <th className="text-right py-2 px-3 text-sub font-medium whitespace-nowrap">1上映あたり来客</th>
                   <th className="text-right py-2 px-3 text-sub font-medium">売上（税込）</th>
                   <th className="text-right py-2 px-3 text-sub font-medium">売上（税抜）</th>
+                  <th className="text-right py-2 px-3 text-sub font-medium whitespace-nowrap">1上映あたり売上</th>
                   <th className="text-left py-2 px-3 text-sub font-medium">備考</th>
                   <th className="text-right py-2 px-3 text-sub font-medium w-20">操作</th>
                 </tr>
@@ -334,11 +336,21 @@ export default function MoviesMaster() {
                       <td className="py-2.5 px-3 text-right text-cream text-xs">
                         {stats ? `${stats.mobilization.toLocaleString()}名` : "—"}
                       </td>
+                      <td className="py-2.5 px-3 text-right text-accent text-xs">
+                        {stats && stats.count > 0
+                          ? (stats.mobilization / stats.count).toFixed(1)
+                          : "—"}
+                      </td>
                       <td className="py-2.5 px-3 text-right text-cream text-xs whitespace-nowrap">
                         {stats ? `¥${stats.revenue_taxin.toLocaleString()}` : "—"}
                       </td>
                       <td className="py-2.5 px-3 text-right text-cream text-xs whitespace-nowrap">
                         {stats ? `¥${stats.revenue_taxout.toLocaleString()}` : "—"}
+                      </td>
+                      <td className="py-2.5 px-3 text-right text-accent text-xs whitespace-nowrap">
+                        {stats && stats.count > 0
+                          ? `¥${Math.round(stats.revenue_taxout / stats.count).toLocaleString()}`
+                          : "—"}
                       </td>
                       <td className="py-2.5 px-3 text-sub text-xs max-w-[160px] truncate">
                         {m.notes ?? "—"}
