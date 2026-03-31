@@ -20,8 +20,16 @@ const EMPTY_FORM = {
   notes: "",
 };
 
+interface TitleStats {
+  count: number;
+  mobilization: number;
+  revenue_taxin: number;
+  revenue_taxout: number;
+}
+
 export default function MoviesMaster() {
   const [movies, setMovies] = useState<Movie[]>([]);
+  const [statsMap, setStatsMap] = useState<Map<string, TitleStats>>(new Map());
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState(EMPTY_FORM);
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -31,11 +39,36 @@ export default function MoviesMaster() {
 
   const fetchMovies = async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("movies")
-      .select("*")
-      .order("start_date", { ascending: false, nullsFirst: false });
-    if (!error && data) setMovies(data);
+    const [moviesRes, reportsRes] = await Promise.all([
+      supabase
+        .from("movies")
+        .select("*")
+        .order("start_date", { ascending: false, nullsFirst: false }),
+      supabase
+        .from("daily_reports")
+        .select("title, mobilization, revenue_taxin, revenue_taxout"),
+    ]);
+    if (!moviesRes.error && moviesRes.data) setMovies(moviesRes.data);
+
+    // Aggregate daily_reports by title
+    const map = new Map<string, TitleStats>();
+    if (!reportsRes.error && reportsRes.data) {
+      for (const r of reportsRes.data) {
+        if (!r.title) continue;
+        const entry = map.get(r.title) ?? {
+          count: 0,
+          mobilization: 0,
+          revenue_taxin: 0,
+          revenue_taxout: 0,
+        };
+        entry.count += 1;
+        entry.mobilization += r.mobilization ?? 0;
+        entry.revenue_taxin += r.revenue_taxin ?? 0;
+        entry.revenue_taxout += r.revenue_taxout ?? 0;
+        map.set(r.title, entry);
+      }
+    }
+    setStatsMap(map);
     setLoading(false);
   };
 
@@ -264,54 +297,73 @@ export default function MoviesMaster() {
                   <th className="text-left py-2 px-3 text-sub font-medium">作品名</th>
                   <th className="text-left py-2 px-3 text-sub font-medium">上映期間</th>
                   <th className="text-left py-2 px-3 text-sub font-medium">グループ</th>
+                  <th className="text-right py-2 px-3 text-sub font-medium">上映回数</th>
+                  <th className="text-right py-2 px-3 text-sub font-medium">来客数</th>
+                  <th className="text-right py-2 px-3 text-sub font-medium">売上（税込）</th>
+                  <th className="text-right py-2 px-3 text-sub font-medium">売上（税抜）</th>
                   <th className="text-left py-2 px-3 text-sub font-medium">備考</th>
-                  <th className="text-right py-2 px-3 text-sub font-medium w-24">操作</th>
+                  <th className="text-right py-2 px-3 text-sub font-medium w-20">操作</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredMovies.map((m) => (
-                  <tr
-                    key={m.id}
-                    className="border-b border-card-border/50 hover:bg-white/[0.02] transition-colors"
-                  >
-                    <td className="py-2.5 px-3 text-cream font-medium">
-                      {m.title}
-                    </td>
-                    <td className="py-2.5 px-3 text-cream text-xs whitespace-nowrap">
-                      {m.start_date ?? "—"} 〜 {m.end_date ?? "—"}
-                    </td>
-                    <td className="py-2.5 px-3">
-                      {m.group_name ? (
-                        <span className="inline-block px-2 py-0.5 rounded bg-accent/10 text-accent text-xs">
-                          {m.group_name}
-                        </span>
-                      ) : (
-                        <span className="text-sub text-xs">—</span>
-                      )}
-                    </td>
-                    <td className="py-2.5 px-3 text-sub text-xs max-w-[200px] truncate">
-                      {m.notes ?? "—"}
-                    </td>
-                    <td className="py-2.5 px-3 text-right">
-                      <div className="flex justify-end gap-1">
-                        <button
-                          onClick={() => handleEdit(m)}
-                          className="p-1.5 rounded-lg text-sub hover:text-accent hover:bg-accent/10 transition-colors"
-                          title="編集"
-                        >
-                          <Pencil size={14} />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(m.id)}
-                          className="p-1.5 rounded-lg text-sub hover:text-red-400 hover:bg-red-400/10 transition-colors"
-                          title="削除"
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                {filteredMovies.map((m) => {
+                  const stats = statsMap.get(m.title);
+                  return (
+                    <tr
+                      key={m.id}
+                      className="border-b border-card-border/50 hover:bg-white/[0.02] transition-colors"
+                    >
+                      <td className="py-2.5 px-3 text-cream font-medium">
+                        {m.title}
+                      </td>
+                      <td className="py-2.5 px-3 text-cream text-xs whitespace-nowrap">
+                        {m.start_date ?? "—"} 〜 {m.end_date ?? "—"}
+                      </td>
+                      <td className="py-2.5 px-3">
+                        {m.group_name ? (
+                          <span className="inline-block px-2 py-0.5 rounded bg-accent/10 text-accent text-xs">
+                            {m.group_name}
+                          </span>
+                        ) : (
+                          <span className="text-sub text-xs">—</span>
+                        )}
+                      </td>
+                      <td className="py-2.5 px-3 text-right text-cream text-xs">
+                        {stats ? `${stats.count}回` : "—"}
+                      </td>
+                      <td className="py-2.5 px-3 text-right text-cream text-xs">
+                        {stats ? `${stats.mobilization.toLocaleString()}名` : "—"}
+                      </td>
+                      <td className="py-2.5 px-3 text-right text-cream text-xs whitespace-nowrap">
+                        {stats ? `¥${stats.revenue_taxin.toLocaleString()}` : "—"}
+                      </td>
+                      <td className="py-2.5 px-3 text-right text-cream text-xs whitespace-nowrap">
+                        {stats ? `¥${stats.revenue_taxout.toLocaleString()}` : "—"}
+                      </td>
+                      <td className="py-2.5 px-3 text-sub text-xs max-w-[160px] truncate">
+                        {m.notes ?? "—"}
+                      </td>
+                      <td className="py-2.5 px-3 text-right">
+                        <div className="flex justify-end gap-1">
+                          <button
+                            onClick={() => handleEdit(m)}
+                            className="p-1.5 rounded-lg text-sub hover:text-accent hover:bg-accent/10 transition-colors"
+                            title="編集"
+                          >
+                            <Pencil size={14} />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(m.id)}
+                            className="p-1.5 rounded-lg text-sub hover:text-red-400 hover:bg-red-400/10 transition-colors"
+                            title="削除"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
