@@ -129,13 +129,25 @@ export default function DailyReportPage() {
 
   const ticketRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-  // Daily totals for the selected date
-  const dailyTotals = useMemo(() => {
+  // Attendance salary for the selected date
+  const [attendanceSalary, setAttendanceSalary] = useState(0);
+
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase
+        .from("attendance")
+        .select("salary")
+        .eq("date", form.date);
+      const total = data?.reduce((s, r) => s + (r.salary ?? 0), 0) ?? 0;
+      setAttendanceSalary(total);
+    })();
+  }, [form.date, reports]);
+
+  // Daily revenue total (tax-excluded) for the selected date
+  const dailyRevenueTaxout = useMemo(() => {
     const dayReports = reports.filter((r) => r.date === form.date);
-    return {
-      revenue: dayReports.reduce((s, r) => s + (r.revenue_taxin ?? 0), 0),
-      salary: dayReports.reduce((s, r) => s + (r.salary ?? 0), 0),
-    };
+    const taxin = dayReports.reduce((s, r) => s + (r.revenue_taxin ?? 0), 0);
+    return Math.floor(taxin / 1.1);
   }, [reports, form.date]);
 
   // Ticket total
@@ -449,15 +461,21 @@ export default function DailyReportPage() {
       {/* Daily summary cards */}
       <div className="flex-1 space-y-4 pt-0">
         <div className="bg-card border border-card-border rounded-2xl p-5">
-          <p className="text-xs text-sub mb-2">{form.date} の売上合計</p>
+          <p className="text-xs text-sub mb-2">{form.date} の売上合計（税抜）</p>
           <p className="text-2xl font-bold text-cream">
-            ¥{dailyTotals.revenue.toLocaleString()}
+            ¥{dailyRevenueTaxout.toLocaleString()}
           </p>
         </div>
         <div className="bg-card border border-card-border rounded-2xl p-5">
           <p className="text-xs text-sub mb-2">{form.date} の給与合計</p>
           <p className="text-2xl font-bold text-cream">
-            ¥{dailyTotals.salary.toLocaleString()}
+            ¥{attendanceSalary.toLocaleString()}
+          </p>
+        </div>
+        <div className="bg-card border border-card-border rounded-2xl p-5">
+          <p className="text-xs text-sub mb-2">固定費</p>
+          <p className="text-2xl font-bold text-cream">
+            ¥70,000
           </p>
         </div>
       </div>
