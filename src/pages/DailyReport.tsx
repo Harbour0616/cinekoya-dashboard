@@ -317,9 +317,9 @@ export default function DailyReportPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-cream">日報登録</h2>
-        <p className="text-2xl font-bold text-accent">
+      <div className="flex items-center gap-6">
+        <h2 className="text-2xl font-bold text-cream w-1/3">日報登録</h2>
+        <p className="text-2xl font-bold text-accent flex-1">
           {new Date(form.date + "T00:00:00").toLocaleDateString("ja-JP", {
             year: "numeric",
             month: "long",
