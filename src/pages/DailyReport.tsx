@@ -555,35 +555,36 @@ export default function DailyReportPage() {
           {dailyMobilByMovie.length === 0 ? (
             <p className="text-sm text-sub text-center py-4">データなし</p>
           ) : (
-            <Bar
-              data={{
-                labels: dailyMobilByMovie.map((d) => d.title),
-                datasets: [
-                  {
-                    data: dailyMobilByMovie.map((d) => d.count),
-                    backgroundColor: "#c8861a",
-                    borderRadius: 4,
+            <div style={{ height: Math.min(dailyMobilByMovie.length * 40, 200) }}>
+              <Bar
+                data={{
+                  labels: dailyMobilByMovie.map((d) => d.title),
+                  datasets: [
+                    {
+                      data: dailyMobilByMovie.map((d) => d.count),
+                      backgroundColor: "#c8861a",
+                      borderRadius: 4,
+                    },
+                  ],
+                }}
+                options={{
+                  indexAxis: "y",
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: { legend: { display: false }, tooltip: { enabled: true } },
+                  scales: {
+                    x: {
+                      ticks: { color: "#a08860", stepSize: 1 },
+                      grid: { color: "rgba(255,180,60,0.06)" },
+                    },
+                    y: {
+                      ticks: { color: "#f5ead8", font: { size: 11 } },
+                      grid: { display: false },
+                    },
                   },
-                ],
-              }}
-              options={{
-                indexAxis: "y",
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false }, tooltip: { enabled: true } },
-                scales: {
-                  x: {
-                    ticks: { color: "#a08860", stepSize: 1 },
-                    grid: { color: "rgba(255,180,60,0.06)" },
-                  },
-                  y: {
-                    ticks: { color: "#f5ead8", font: { size: 11 } },
-                    grid: { display: false },
-                  },
-                },
-              }}
-              height={Math.max(dailyMobilByMovie.length * 32, 80)}
-            />
+                }}
+              />
+            </div>
           )}
         </div>
       </div>
