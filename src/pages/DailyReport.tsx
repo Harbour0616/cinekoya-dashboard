@@ -160,42 +160,50 @@ export default function DailyReportPage() {
     setSaving(true);
     setSaveMsg(null);
 
-    const revenueTaxout = Math.round(calculatedRevenue / 1.1);
-    const profit = revenueTaxout - form.salary;
+    try {
+      const revenueTaxout = Math.round(calculatedRevenue / 1.1);
+      const profit = revenueTaxout - form.salary;
 
-    const payload = {
-      date: form.date,
-      title: form.title,
-      time_slot: form.time_slot,
-      audience_total: ticketTotal,
-      mobilization: ticketTotal,
-      revenue_taxin: calculatedRevenue,
-      revenue_taxout: revenueTaxout,
-      salary: form.salary,
-      profit,
-      ...form.tickets,
-    };
+      const payload = {
+        date: form.date,
+        title: form.title,
+        time_slot: form.time_slot,
+        audience_total: ticketTotal,
+        mobilization: ticketTotal,
+        revenue_taxin: calculatedRevenue,
+        revenue_taxout: revenueTaxout,
+        salary: form.salary,
+        profit,
+        ...form.tickets,
+      };
 
-    let error;
-    if (editingId) {
-      ({ error } = await supabase
-        .from("daily_reports")
-        .update(payload)
-        .eq("id", editingId));
-    } else {
-      ({ error } = await supabase.from("daily_reports").insert(payload));
+      let error;
+      if (editingId) {
+        ({ error } = await supabase
+          .from("daily_reports")
+          .update(payload)
+          .eq("id", editingId));
+      } else {
+        ({ error } = await supabase.from("daily_reports").insert(payload));
+      }
+
+      if (error) {
+        setSaveMsg("エラー: " + error.message);
+      } else {
+        setSaveMsg(editingId ? "更新しました" : "登録しました");
+        setForm(EMPTY_FORM);
+        setMovieSearch("");
+        setEditingId(null);
+        fetchReports();
+      }
+    } catch (err) {
+      console.error("日報登録エラー:", err);
+      setSaveMsg(
+        "エラー: " + (err instanceof Error ? err.message : "予期しないエラー")
+      );
+    } finally {
+      setSaving(false);
     }
-
-    if (error) {
-      setSaveMsg("エラー: " + error.message);
-    } else {
-      setSaveMsg(editingId ? "更新しました" : "登録しました");
-      setForm(EMPTY_FORM);
-      setMovieSearch("");
-      setEditingId(null);
-      fetchReports();
-    }
-    setSaving(false);
   };
 
   const handleEdit = (r: DailyReport) => {
