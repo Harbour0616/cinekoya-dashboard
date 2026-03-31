@@ -251,6 +251,7 @@ export default function Audience() {
             }}
             options={{
               responsive: true,
+              aspectRatio: 3,
               interaction: { mode: "index", intersect: false },
               plugins: {
                 legend: {
@@ -396,10 +397,13 @@ function buildDailyData(reports: typeof sampleReports, titles: string[]) {
     movieMap.set(title, dateMap);
   }
 
+  const WEEKDAYS = ['日', '月', '火', '水', '木', '金', '土'];
   const sortedDates = Array.from(allDates).sort();
-  const labels = sortedDates.map((d) => {
-    const [, m, day] = d.split("-");
-    return `${parseInt(m)}/${parseInt(day)}`;
+  const labels = sortedDates.map((dateStr) => {
+    const [, m, day] = dateStr.split("-");
+    const d = new Date(dateStr);
+    const weekday = WEEKDAYS[d.getDay()];
+    return `${parseInt(m)}/${parseInt(day)}（${weekday}）`;
   });
 
   const datasets = titles.map((title, i) => {
