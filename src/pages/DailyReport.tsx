@@ -461,6 +461,14 @@ export default function DailyReportPage() {
 
       {/* Daily summary cards */}
       <div className="flex-1 space-y-4 pt-0">
+        <p className="text-3xl font-bold text-accent">
+          {new Date(form.date + "T00:00:00").toLocaleDateString("ja-JP", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+            weekday: "short",
+          })}
+        </p>
         <div className="bg-card border border-card-border rounded-2xl p-5">
           <p className="text-xs text-sub mb-2">{form.date} の売上合計（税抜）</p>
           <p className="text-2xl font-bold text-cream">
