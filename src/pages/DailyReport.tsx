@@ -55,7 +55,6 @@ interface FormState {
   time_slot: string;
   tickets: TicketForm;
   revenue_taxin: number;
-  salary: number;
   notes: string;
 }
 
@@ -65,7 +64,6 @@ const EMPTY_FORM: FormState = {
   time_slot: "10:30",
   tickets: { ...EMPTY_TICKETS },
   revenue_taxin: 0,
-  salary: 0,
   notes: "",
 };
 
@@ -237,7 +235,6 @@ export default function DailyReportPage() {
 
     try {
       const revenueTaxout = Math.round(calculatedRevenue / 1.1);
-      const profit = revenueTaxout - form.salary;
 
       const payload = {
         date: form.date,
@@ -247,8 +244,6 @@ export default function DailyReportPage() {
         mobilization: ticketTotal,
         revenue_taxin: calculatedRevenue,
         revenue_taxout: revenueTaxout,
-        salary: form.salary,
-        profit,
         ...form.tickets,
       };
 
@@ -300,7 +295,6 @@ export default function DailyReportPage() {
         audience_highschool: r.audience_highschool ?? 0,
       },
       revenue_taxin: r.revenue_taxin ?? 0,
-      salary: r.salary ?? 0,
       notes: "",
     });
     setMovieSearch(r.title ?? "");
@@ -470,21 +464,6 @@ export default function DailyReportPage() {
             readOnly
             value={`¥${calculatedRevenue.toLocaleString()}`}
             className="w-full bg-white/[0.06] border border-card-border rounded-lg px-3 py-2 text-sm text-cream outline-none cursor-default"
-          />
-        </div>
-
-        {/* 給与 */}
-        <div>
-          <label className="block text-xs text-sub mb-1">給与</label>
-          <input
-            type="number"
-            min={0}
-            value={form.salary || ""}
-            onChange={(e) =>
-              setForm({ ...form, salary: parseInt(e.target.value) || 0 })
-            }
-            className="w-full bg-white/[0.03] border border-card-border rounded-lg px-3 py-2 text-sm text-cream outline-none focus:border-accent/40 transition-colors"
-            placeholder="0"
           />
         </div>
 
