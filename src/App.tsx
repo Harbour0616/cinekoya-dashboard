@@ -5,6 +5,7 @@ import Audience from "./pages/Audience";
 import Movies from "./pages/Movies";
 import MoviesMaster from "./pages/MoviesMaster";
 import DailyReport from "./pages/DailyReport";
+import Attendance from "./pages/Attendance";
 import Import from "./pages/Import";
 
 export default function App() {
@@ -17,6 +18,7 @@ export default function App() {
           <Route path="/movies" element={<Movies />} />
           <Route path="/movies-master" element={<MoviesMaster />} />
           <Route path="/daily-report" element={<DailyReport />} />
+          <Route path="/attendance" element={<Attendance />} />
           <Route path="/import" element={<Import />} />
         </Routes>
       </Layout>

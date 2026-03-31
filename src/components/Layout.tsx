@@ -5,6 +5,7 @@ import {
   Film,
   Clapperboard,
   ClipboardList,
+  CalendarCheck,
   Upload,
 } from "lucide-react";
 
@@ -14,6 +15,7 @@ const menuItems = [
   { to: "/movies", label: "作品分析", icon: Film },
   { to: "/movies-master", label: "作品管理", icon: Clapperboard },
   { to: "/daily-report", label: "日報登録", icon: ClipboardList },
+  { to: "/attendance", label: "出勤簿", icon: CalendarCheck },
   { to: "/import", label: "データインポート", icon: Upload },
 ];
 

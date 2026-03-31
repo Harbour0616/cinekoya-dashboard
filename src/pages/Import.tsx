@@ -2,9 +2,10 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import CSVImport from "../components/CSVImport";
 import ExcelImport from "../components/ExcelImport";
+import AttendanceImport from "../components/AttendanceImport";
 import { supabase } from "../lib/supabase";
 
-type Mode = "excel" | "csv";
+type Mode = "excel" | "csv" | "attendance";
 
 export default function Import() {
   const navigate = useNavigate();
@@ -116,7 +117,7 @@ export default function Import() {
       </div>
 
       {/* Mode tabs */}
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         <button
           onClick={() => setMode("excel")}
           className={`px-5 py-2.5 rounded-xl text-sm font-medium transition-colors ${
@@ -125,7 +126,7 @@ export default function Import() {
               : "bg-card border border-card-border text-sub hover:text-cream"
           }`}
         >
-          📊 Excelファイル（.xlsx）
+          📊 日報Excel（.xlsx）
         </button>
         <button
           onClick={() => setMode("csv")}
@@ -137,12 +138,24 @@ export default function Import() {
         >
           📄 CSVファイル
         </button>
+        <button
+          onClick={() => setMode("attendance")}
+          className={`px-5 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+            mode === "attendance"
+              ? "bg-accent text-bg"
+              : "bg-card border border-card-border text-sub hover:text-cream"
+          }`}
+        >
+          📋 出勤簿Excel
+        </button>
       </div>
 
       {mode === "excel" ? (
         <ExcelImport onComplete={handleComplete} />
-      ) : (
+      ) : mode === "csv" ? (
         <CSVImport onComplete={handleComplete} />
+      ) : (
+        <AttendanceImport />
       )}
     </div>
   );
