@@ -324,7 +324,6 @@ export default function DailyReportPage() {
         <div>
           <label className="block text-xs text-sub mb-2">
             動員数（券種別）
-            <span className="ml-2 text-accent font-bold">合計: {ticketTotal}人</span>
           </label>
           <div className="space-y-3">
             {TICKET_TYPES.map((t, i) => (
@@ -372,7 +371,10 @@ export default function DailyReportPage() {
 
         {/* 売上（税込・自動計算） */}
         <div>
-          <label className="block text-xs text-sub mb-1">売上（税込・自動計算）</label>
+          <label className="block text-xs text-sub mb-1">
+            売上（税込・自動計算）
+            <span className="ml-2 text-accent font-bold">合計: {ticketTotal}人</span>
+          </label>
           <input
             type="text"
             readOnly
