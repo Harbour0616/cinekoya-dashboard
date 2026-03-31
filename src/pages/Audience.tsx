@@ -7,8 +7,10 @@ import {
   LineElement,
   Tooltip,
   Legend,
+  Filler,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
+import { Search } from "lucide-react";
 import { useDailyReports } from "../hooks/useDailyReports";
 import { sampleReports } from "../data/sampleData";
 
@@ -18,7 +20,8 @@ ChartJS.register(
   PointElement,
   LineElement,
   Tooltip,
-  Legend
+  Legend,
+  Filler
 );
 
 const COLORS = [
@@ -36,21 +39,73 @@ const COLORS = [
   "#818cf8",
 ];
 
+type Period = "1m" | "3m" | "6m" | "1y" | "all";
+
+const PERIODS: { key: Period; label: string }[] = [
+  { key: "1m", label: "直近1ヶ月" },
+  { key: "3m", label: "3ヶ月" },
+  { key: "6m", label: "6ヶ月" },
+  { key: "1y", label: "1年" },
+  { key: "all", label: "全期間" },
+];
+
+function getPeriodStartDate(period: Period): string | null {
+  if (period === "all") return null;
+  const now = new Date();
+  const months = { "1m": 1, "3m": 3, "6m": 6, "1y": 12 }[period];
+  const d = new Date(now.getFullYear(), now.getMonth() - months, now.getDate());
+  return d.toISOString().split("T")[0];
+}
+
 export default function Audience() {
   const { reports: dbReports, loading } = useDailyReports();
   const reports = dbReports.length > 0 ? dbReports : sampleReports;
 
-  const allTitles = useMemo(() => {
-    const set = new Set<string>();
-    for (const r of reports) {
-      if (r.title) set.add(r.title);
-    }
-    return Array.from(set).sort();
-  }, [reports]);
-
+  const [period, setPeriod] = useState<Period>("3m");
+  const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
-  const isAllSelected = selected.size === 0;
+  // Titles within selected period, sorted by earliest screening date (newest first)
+  const filteredTitles = useMemo(() => {
+    const startDate = getPeriodStartDate(period);
+    const titleMinDate = new Map<string, string>();
+
+    for (const r of reports) {
+      if (!r.title || !r.date) continue;
+      if (startDate && r.date < startDate) continue;
+      const existing = titleMinDate.get(r.title);
+      if (!existing || r.date < existing) {
+        titleMinDate.set(r.title, r.date);
+      }
+    }
+
+    let titles = Array.from(titleMinDate.entries());
+
+    // Search filter
+    if (search.trim()) {
+      const q = search.trim().toLowerCase();
+      titles = titles.filter(([t]) => t.toLowerCase().includes(q));
+    }
+
+    // Sort by first screening date descending (newest first)
+    titles.sort((a, b) => b[1].localeCompare(a[1]));
+
+    return titles.map(([t]) => t);
+  }, [reports, period, search]);
+
+  // When period/search changes, prune selected to only valid titles
+  const validSelected = useMemo(() => {
+    const set = new Set<string>();
+    for (const t of selected) {
+      if (filteredTitles.includes(t)) set.add(t);
+    }
+    return set;
+  }, [selected, filteredTitles]);
+
+  const isAllSelected = validSelected.size === 0;
+  const activeTitles = isAllSelected
+    ? filteredTitles
+    : Array.from(validSelected);
 
   const toggleTitle = (title: string) => {
     setSelected((prev) => {
@@ -61,87 +116,131 @@ export default function Audience() {
     });
   };
 
-  const selectAll = () => setSelected(new Set());
-  const clearAll = () => setSelected(new Set(["__none__"]));
+  const selectAllFiltered = () => setSelected(new Set(filteredTitles));
+  const clearAll = () => setSelected(new Set());
 
-  const activeTitles = isAllSelected ? allTitles : Array.from(selected).filter((t) => t !== "__none__");
+  // Filter reports by period for charts
+  const periodReports = useMemo(() => {
+    const startDate = getPeriodStartDate(period);
+    if (!startDate) return reports;
+    return reports.filter((r) => r.date && r.date >= startDate);
+  }, [reports, period]);
 
   const chartData = useMemo(() => {
     if (isAllSelected) {
-      return buildMonthlyData(reports);
+      return buildMonthlyData(periodReports);
     }
-    return buildDailyData(reports, activeTitles);
-  }, [reports, isAllSelected, activeTitles]);
+    return buildDailyData(periodReports, activeTitles);
+  }, [periodReports, isAllSelected, activeTitles]);
 
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-cream">来客数分析</h2>
 
-      {loading && <div className="text-center py-12 text-sub">読み込み中...</div>}
+      {loading && (
+        <div className="text-center py-12 text-sub">読み込み中...</div>
+      )}
 
-      {/* Movie selector */}
-      <div className="bg-card border border-card-border rounded-2xl p-5">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-bold text-cream">作品選択</h3>
-          <div className="flex gap-2">
-            <button
-              onClick={selectAll}
-              className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
-                isAllSelected
-                  ? "bg-accent text-bg"
-                  : "bg-card border border-card-border text-sub hover:text-cream"
-              }`}
-            >
-              全作品
-            </button>
-            <button
-              onClick={clearAll}
-              className="px-3 py-1 rounded-lg text-xs font-medium bg-card border border-card-border text-sub hover:text-cream transition-colors"
-            >
-              選択クリア
-            </button>
-          </div>
-        </div>
-        <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto">
-          {allTitles.map((title) => {
-            const checked = isAllSelected || selected.has(title);
-            return (
-              <label
-                key={title}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs cursor-pointer transition-colors ${
-                  checked
-                    ? "bg-accent/15 text-accent border border-accent/30"
-                    : "bg-white/[0.02] text-sub border border-card-border hover:text-cream"
+      {/* Movie selector card */}
+      <div className="bg-card border border-card-border rounded-2xl p-5 space-y-4">
+        {/* Period filter */}
+        <div>
+          <h3 className="text-xs font-medium text-sub mb-2">期間</h3>
+          <div className="flex flex-wrap gap-1.5">
+            {PERIODS.map((p) => (
+              <button
+                key={p.key}
+                onClick={() => setPeriod(p.key)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                  period === p.key
+                    ? "bg-accent text-bg"
+                    : "bg-white/[0.03] text-sub border border-card-border hover:text-cream"
                 }`}
               >
-                <input
-                  type="checkbox"
-                  checked={checked}
-                  onChange={() => {
-                    if (isAllSelected) {
-                      // Switch from "all" to individual: select only this one
-                      setSelected(new Set([title]));
-                    } else {
-                      toggleTitle(title);
-                    }
-                  }}
-                  className="accent-[#c8861a] w-3 h-3"
-                />
-                {title}
-              </label>
-            );
-          })}
+                {p.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Search */}
+        <div>
+          <div className="relative">
+            <Search
+              size={14}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-sub"
+            />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="作品名で検索..."
+              className="w-full bg-white/[0.03] border border-card-border rounded-lg pl-9 pr-3 py-2 text-sm text-cream placeholder:text-sub/60 outline-none focus:border-accent/40 transition-colors"
+            />
+          </div>
+        </div>
+
+        {/* Title checkboxes */}
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-xs font-medium text-sub">
+              作品選択
+              <span className="ml-2 text-accent">{filteredTitles.length}作品</span>
+            </h3>
+            <div className="flex gap-2">
+              <button
+                onClick={selectAllFiltered}
+                className="px-3 py-1 rounded-lg text-xs font-medium bg-white/[0.03] border border-card-border text-sub hover:text-cream transition-colors"
+              >
+                全選択
+              </button>
+              <button
+                onClick={clearAll}
+                className="px-3 py-1 rounded-lg text-xs font-medium bg-white/[0.03] border border-card-border text-sub hover:text-cream transition-colors"
+              >
+                クリア
+              </button>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto">
+            {filteredTitles.map((title) => {
+              const checked = validSelected.has(title);
+              return (
+                <label
+                  key={title}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs cursor-pointer transition-colors ${
+                    checked
+                      ? "bg-accent/15 text-accent border border-accent/30"
+                      : "bg-white/[0.02] text-sub border border-card-border hover:text-cream"
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={() => toggleTitle(title)}
+                    className="accent-[#c8861a] w-3 h-3"
+                  />
+                  {title}
+                </label>
+              );
+            })}
+            {filteredTitles.length === 0 && (
+              <p className="text-sub text-xs py-2">該当する作品がありません</p>
+            )}
+          </div>
         </div>
       </div>
 
       {/* Chart */}
       <div className="bg-card border border-card-border rounded-2xl p-5">
         <h3 className="text-sm font-bold text-cream mb-1">
-          {isAllSelected ? "月次来客数推移（全作品合計）" : "日次来客数推移（選択作品）"}
+          {isAllSelected
+            ? "月次来客数推移（全作品合計）"
+            : "日次来客数推移（選択作品）"}
         </h3>
         <p className="text-xs text-sub mb-4">
           {isAllSelected
-            ? "全作品選択時は月次集計で表示"
+            ? "作品未選択時は月次集計で表示"
             : `${activeTitles.length}作品選択中 — 上映期間中の日次データ`}
         </p>
         {chartData.labels.length > 0 ? (
@@ -166,7 +265,11 @@ export default function Audience() {
               },
               scales: {
                 x: {
-                  ticks: { color: "#a08860", maxRotation: 45, font: { size: 10 } },
+                  ticks: {
+                    color: "#a08860",
+                    maxRotation: 45,
+                    font: { size: 10 },
+                  },
                   grid: { color: "rgba(255,180,60,0.06)" },
                 },
                 y: {
@@ -179,28 +282,38 @@ export default function Audience() {
           />
         ) : (
           <div className="text-center py-12 text-sub">
-            作品を選択してください
+            データがありません
           </div>
         )}
       </div>
 
       {/* Summary table */}
-      {activeTitles.length > 0 && (
+      {activeTitles.length > 0 && !isAllSelected && (
         <div className="bg-card border border-card-border rounded-2xl p-5">
           <h3 className="text-sm font-bold text-cream mb-3">選択作品サマリー</h3>
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
               <thead>
                 <tr className="border-b border-card-border">
-                  <th className="text-left py-2 px-3 text-sub font-medium">作品名</th>
-                  <th className="text-right py-2 px-3 text-sub font-medium">総動員数</th>
-                  <th className="text-right py-2 px-3 text-sub font-medium">上映回数</th>
-                  <th className="text-right py-2 px-3 text-sub font-medium">平均動員</th>
+                  <th className="text-left py-2 px-3 text-sub font-medium">
+                    作品名
+                  </th>
+                  <th className="text-right py-2 px-3 text-sub font-medium">
+                    総動員数
+                  </th>
+                  <th className="text-right py-2 px-3 text-sub font-medium">
+                    上映回数
+                  </th>
+                  <th className="text-right py-2 px-3 text-sub font-medium">
+                    平均動員
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {activeTitles.map((title) => {
-                  const titleReports = reports.filter((r) => r.title === title);
+                  const titleReports = periodReports.filter(
+                    (r) => r.title === title
+                  );
                   const total = titleReports.reduce(
                     (s, r) => s + (r.mobilization ?? 0),
                     0
@@ -216,8 +329,12 @@ export default function Audience() {
                       <td className="py-2 px-3 text-right text-cream">
                         {total.toLocaleString()}人
                       </td>
-                      <td className="py-2 px-3 text-right text-sub">{count}回</td>
-                      <td className="py-2 px-3 text-right text-cream">{avg}人</td>
+                      <td className="py-2 px-3 text-right text-sub">
+                        {count}回
+                      </td>
+                      <td className="py-2 px-3 text-right text-cream">
+                        {avg}人
+                      </td>
                     </tr>
                   );
                 })}
@@ -236,12 +353,16 @@ function buildMonthlyData(reports: typeof sampleReports) {
 
   for (const r of reports) {
     if (!r.date) continue;
-    const key = r.date.slice(0, 7); // "YYYY-MM"
+    const key = r.date.slice(0, 7);
     map.set(key, (map.get(key) ?? 0) + (r.mobilization ?? 0));
   }
 
-  const sorted = Array.from(map.entries()).sort((a, b) => a[0].localeCompare(b[0]));
-  const labels = sorted.map(([k]) => k.replace(/^\d{4}-/, "").replace(/^0/, "") + "月");
+  const sorted = Array.from(map.entries()).sort((a, b) =>
+    a[0].localeCompare(b[0])
+  );
+  const labels = sorted.map(
+    ([k]) => k.replace(/^\d{4}-/, "").replace(/^0/, "") + "月"
+  );
   const data = sorted.map(([, v]) => v);
 
   return {
@@ -262,7 +383,6 @@ function buildMonthlyData(reports: typeof sampleReports) {
 
 /** Daily per-movie lines for selected movies */
 function buildDailyData(reports: typeof sampleReports, titles: string[]) {
-  // Collect all dates across selected movies
   const allDates = new Set<string>();
   const movieMap = new Map<string, Map<string, number>>();
 
