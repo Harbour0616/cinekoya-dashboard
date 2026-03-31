@@ -129,6 +129,15 @@ export default function DailyReportPage() {
 
   const ticketRefs = useRef<(HTMLInputElement | null)[]>([]);
 
+  // Daily totals for the selected date
+  const dailyTotals = useMemo(() => {
+    const dayReports = reports.filter((r) => r.date === form.date);
+    return {
+      revenue: dayReports.reduce((s, r) => s + (r.revenue_taxin ?? 0), 0),
+      salary: dayReports.reduce((s, r) => s + (r.salary ?? 0), 0),
+    };
+  }, [reports, form.date]);
+
   // Ticket total
   const ticketTotal = Object.values(form.tickets).reduce((s, v) => s + v, 0);
 
@@ -224,10 +233,11 @@ export default function DailyReportPage() {
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-cream">日報登録</h2>
 
+      <div className="flex gap-6">
       {/* Registration form */}
       <form
         onSubmit={handleSubmit}
-        className="bg-card border border-card-border rounded-2xl p-5 space-y-4 max-w-[33%]"
+        className="bg-card border border-card-border rounded-2xl p-5 space-y-4 w-1/3 shrink-0"
       >
         <h3 className="text-sm font-bold text-cream">
           {editingId ? "日報を編集" : "日報を登録"}
@@ -413,6 +423,23 @@ export default function DailyReportPage() {
           )}
         </div>
       </form>
+
+      {/* Daily summary cards */}
+      <div className="flex-1 space-y-4 pt-0">
+        <div className="bg-card border border-card-border rounded-2xl p-5">
+          <p className="text-xs text-sub mb-2">{form.date} の売上合計</p>
+          <p className="text-2xl font-bold text-cream">
+            ¥{dailyTotals.revenue.toLocaleString()}
+          </p>
+        </div>
+        <div className="bg-card border border-card-border rounded-2xl p-5">
+          <p className="text-xs text-sub mb-2">{form.date} の給与合計</p>
+          <p className="text-2xl font-bold text-cream">
+            ¥{dailyTotals.salary.toLocaleString()}
+          </p>
+        </div>
+      </div>
+      </div>
 
       {/* Report list */}
       <div className="bg-card border border-card-border rounded-2xl p-5 space-y-4">
