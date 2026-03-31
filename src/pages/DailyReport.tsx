@@ -506,7 +506,7 @@ export default function DailyReportPage() {
       {/* Daily summary cards */}
       <div className="flex-1 space-y-4 pt-0">
         <div className="bg-card border border-card-border rounded-2xl p-5">
-          <p className="text-xs text-sub mb-2">{form.date} の売上合計（税抜）</p>
+          <p className="text-xs text-sub mb-2">売上（税抜）</p>
           <p className="text-2xl font-bold text-cream">
             ¥{dailyRevenueTaxout.toLocaleString()}
           </p>
@@ -518,7 +518,7 @@ export default function DailyReportPage() {
           </p>
         </div>
         <div className="bg-card border border-card-border rounded-2xl p-5">
-          <p className="text-xs text-sub mb-2">{form.date} の給与合計</p>
+          <p className="text-xs text-sub mb-2">給与</p>
           <p className="text-2xl font-bold text-cream">
             ¥{attendanceSalary.toLocaleString()}
           </p>
@@ -533,7 +533,7 @@ export default function DailyReportPage() {
           const profit = dailyRevenueTaxout - Math.floor(dailyRevenueTaxout * 0.5) - attendanceSalary - 70000;
           return (
             <div className="bg-card border border-card-border rounded-2xl p-5">
-              <p className="text-xs text-sub mb-2">{form.date} の利益</p>
+              <p className="text-xs text-sub mb-2">利益</p>
               <p className={`text-2xl font-bold ${profit >= 0 ? "text-green-400" : "text-red-400"}`}>
                 ¥{profit.toLocaleString()}
               </p>
