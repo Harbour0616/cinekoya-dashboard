@@ -67,6 +67,7 @@ export default function DailyReportPage() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
   const [saveMsg, setSaveMsg] = useState<string | null>(null);
+  const [titleError, setTitleError] = useState(false);
 
   const [reports, setReports] = useState<DailyReport[]>([]);
   const [loading, setLoading] = useState(true);
@@ -96,8 +97,7 @@ export default function DailyReportPage() {
     const { data, error } = await supabase
       .from("daily_reports")
       .select("*")
-      .order("date", { ascending: false })
-      .order("time_slot", { ascending: true });
+      .order("created_at", { ascending: false });
     if (!error && data) setReports(data);
     setLoading(false);
   };
@@ -156,7 +156,11 @@ export default function DailyReportPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.title.trim()) return;
+    if (!form.title.trim()) {
+      setTitleError(true);
+      return;
+    }
+    setTitleError(false);
     setSaving(true);
     setSaveMsg(null);
 
@@ -190,7 +194,9 @@ export default function DailyReportPage() {
       if (error) {
         setSaveMsg("エラー: " + error.message);
       } else {
-        setSaveMsg(editingId ? "更新しました" : "登録しました");
+        const msg = editingId ? "更新しました" : "登録しました";
+        setSaveMsg(msg);
+        setTimeout(() => setSaveMsg((cur) => (cur === msg ? null : cur)), 5000);
         setForm(EMPTY_FORM);
         setMovieSearch("");
         setEditingId(null);
@@ -301,6 +307,7 @@ export default function DailyReportPage() {
                 setMovieSearch(e.target.value);
                 setForm({ ...form, title: e.target.value });
                 setShowMovieDropdown(true);
+                if (e.target.value.trim()) setTitleError(false);
               }}
               onFocus={() => setShowMovieDropdown(true)}
               onBlur={() => setTimeout(() => setShowMovieDropdown(false), 200)}
@@ -325,6 +332,9 @@ export default function DailyReportPage() {
                 </button>
               ))}
             </div>
+          )}
+          {titleError && (
+            <p className="text-xs text-red-400 mt-1">作品名を選択してください</p>
           )}
         </div>
 
